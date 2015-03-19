@@ -1,0 +1,489 @@
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/Sockets.java mars-sockets/mars/mips/instructions/syscalls/Sockets.java
+--- mars-vanilla/mars/mips/instructions/syscalls/Sockets.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/Sockets.java	2015-03-17 16:39:29.330746896 -0400
+@@ -0,0 +1,82 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++import java.util.ArrayList;
++
++/**
++ * A static class responsible for holding all the sockets used across the various Socket Syscalls.
++ * 
++ * Common utilities for reading to/from buffers, registers, and memory can be found in SocketUtils.
++ */
++public final class Sockets {
++    private static ArrayList<ServerSocket> serverSockets = new ArrayList<>();
++    private static ArrayList<Socket> sockets = new ArrayList<>();
++
++    private Sockets() {
++        serverSockets = new ArrayList<>();
++        sockets = new ArrayList<>();
++    }
++
++    // ServerSocket operations
++    public static int newServerSocket(int port) {
++        try {
++            ServerSocket s = new ServerSocket(port);
++            serverSockets.add(s);
++            return serverSockets.size() - 1;
++        } catch (Exception e) {
++            System.out.println("Unable to open ServerSocket");
++            e.printStackTrace();
++            return -1;
++        }
++    }
++
++    public static ServerSocket getServerSocket(int fd) {
++        return serverSockets.get(fd);
++    }
++
++    public static void closeServerSocket(int fd) {
++        try {
++            serverSockets.get(fd).close();
++        } catch (IOException e) {
++            // Really, there's not much we can do.
++        }
++    }
++
++    // Socket operations
++    public static int newSocket(String host, int port) {
++        try {
++            return addSocket(new Socket(host, port));
++        } catch (Exception e) {
++            System.out.println("Unable to open Socket");
++            e.printStackTrace();
++            return -1;
++        }
++    }
++
++    public static int addSocket(Socket s) {
++        sockets.add(s);
++        return sockets.size() - 1;
++    }
++
++    public static Socket getSocket(int fd) {
++        return sockets.get(fd);
++    }
++
++    public static void closeSocket(int fd) {
++        try {
++            sockets.get(fd).close();
++        } catch (IOException e) {
++            // Really, there's not much we can do.
++        }
++    }
++}
++
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SocketUtils.java mars-sockets/mars/mips/instructions/syscalls/SocketUtils.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SocketUtils.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SocketUtils.java	2015-03-17 17:00:45.642756925 -0400
+@@ -0,0 +1,89 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++import java.util.ArrayList;
++
++/**
++ * A static class containing common utilities for reading to/from buffers, registers, and memory.
++ */
++public final class SocketUtils {
++    private SocketUtils() {}
++
++    public static byte[] readToNull(int addr, int maxLen) {
++        byte[] buff = new byte[maxLen];
++        int b = 0;
++        try {
++           b = Globals.memory.getByte(addr);
++        } catch(AddressErrorException e){}
++        int actualLen = 0;
++        while (actualLen < maxLen && b != 0) {
++            buff[actualLen] = (byte)b;
++            addr += 1;
++            try {
++                b = Globals.memory.getByte(addr);
++            } catch(AddressErrorException e) {
++            }
++            actualLen += 1;
++        }
++        
++        return Arrays.copyOfRange(buff, 0, actualLen);
++    }
++
++    public static byte[] readToLength(int addr, int maxLen) {
++        byte[] buff = new byte[maxLen];
++        for (int i = 0; i < maxLen; i++) {
++            try {
++                buff[i] = (byte)Globals.memory.getByte(addr++);
++            } catch (AddressErrorException e) {
++                System.out.println("Choked on address: " + addr);
++                break;
++            }
++        }
++        return buff;
++    }
++
++    private static byte[] rotateFourBytes(byte[] bytes, byte newByte) {
++        bytes[0] = bytes[1];
++        bytes[1] = bytes[2];
++        bytes[2] = bytes[3];
++        bytes[3] = newByte;
++        return bytes;
++    }
++
++    private static boolean isDoubleCRLF(byte[] bytes) {
++        final byte CR = 13; //(byte)'\r';
++        final byte LF = 10; //(byte)'\n';
++        return (bytes[0] == CR && bytes[1] == LF && bytes[2] == CR && bytes[3] == LF);
++    }
++
++    public static byte[] readToDoubleCRLF(int addr, int maxLen) {
++        byte[] buff = new byte[maxLen];
++        byte[] lastFourBytes = new byte[]{0, 0, 0, 0};
++
++        for (int i = 0; i < maxLen; i++) {
++            try {
++                byte b = (byte)Globals.memory.getByte(addr++);
++                buff[i] = b;
++                rotateFourBytes(lastFourBytes, b);
++                if (isDoubleCRLF(lastFourBytes)) {
++                    break;
++                }
++            } catch (AddressErrorException e) {
++                System.out.println("Choked on address: " + addr);
++                break;
++            }
++        }
++
++        return buff;
++    }
++}
++
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketAccept.java mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketAccept.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketAccept.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketAccept.java	2015-02-27 12:12:54.777738614 -0500
+@@ -0,0 +1,32 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallServerSocketAccept extends AbstractSyscall {
++    public SyscallServerSocketAccept() {
++        super(112, "ServerSocketAccept");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd = RegisterFile.getValue(4);
++        try {
++            Socket s = Sockets.getServerSocket(fd).accept();
++            int clientSockFD = Sockets.addSocket(s);
++            RegisterFile.updateRegister(3, clientSockFD); // $v0 is taken by system, so our returns go in $v1
++        } catch(Exception e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketBind.java mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketBind.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketBind.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketBind.java	2015-02-27 12:20:49.717743722 -0500
+@@ -0,0 +1,35 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.net.InetSocketAddress;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallServerSocketBind extends AbstractSyscall {
++    public SyscallServerSocketBind() {
++        super(111, "ServerSocketBind");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd = RegisterFile.getValue(4);
++        int hostnameAddr = RegisterFile.getValue(5);
++        String hostname = new String(SocketUtils.readToNull(hostnameAddr, 1024));
++        try {
++            ServerSocket s = Sockets.getServerSocket(fd);
++            s.bind(new InetSocketAddress(hostname, s.getLocalPort()));
++            RegisterFile.updateRegister(3, 1);
++        } catch(Exception e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketClose.java mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketClose.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketClose.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketClose.java	2015-02-27 12:28:59.413748989 -0500
+@@ -0,0 +1,31 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class  SyscallServerSocketClose extends AbstractSyscall {
++    public SyscallServerSocketClose() {
++        super(113, "ServerSocketClose");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd = RegisterFile.getValue(4);
++        try {
++            Sockets.getServerSocket(fd).close();
++            RegisterFile.updateRegister(3, 1); // $v0 is taken by system, so our returns go in $v1
++        } catch(Exception e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketOpen.java mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketOpen.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallServerSocketOpen.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallServerSocketOpen.java	2015-02-27 12:20:14.621743345 -0500
+@@ -0,0 +1,30 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallServerSocketOpen extends AbstractSyscall {
++    public SyscallServerSocketOpen() {
++        super(110, "ServerSocketOpen");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int port = RegisterFile.getValue(4);
++        try {
++            int fd = Sockets.newServerSocket(port);
++            RegisterFile.updateRegister(3, fd); // $v0 is taken by system, so our returns go in $v1
++        } catch(Exception e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketClose.java mars-sockets/mars/mips/instructions/syscalls/SyscallSocketClose.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketClose.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallSocketClose.java	2015-02-27 01:20:38.769311701 -0500
+@@ -0,0 +1,28 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallSocketClose extends AbstractSyscall {
++    public SyscallSocketClose() {
++        super(103, "SocketClose");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd = RegisterFile.getValue(4);
++        try {
++            Sockets.getSocket(fd).close();
++        } catch (Exception e) {
++            // Not a whole lot we can do.
++            e.printStackTrace();
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketOpen.java mars-sockets/mars/mips/instructions/syscalls/SyscallSocketOpen.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketOpen.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallSocketOpen.java	2015-02-27 12:11:10.229737489 -0500
+@@ -0,0 +1,34 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.net.ServerSocket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallSocketOpen extends AbstractSyscall {
++    public SyscallSocketOpen() {
++        super(100, "SocketOpen");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int hostAddr = RegisterFile.getValue(4);
++        String host = new String(SocketUtils.readToNull(hostAddr, 1024));
++        int port = RegisterFile.getValue(5);
++
++        try {
++            int fd = Sockets.newSocket(host, port);
++            RegisterFile.updateRegister(3, fd); // $v0 is taken by system, so our returns go in $v1
++        } catch(Exception e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketRead.java mars-sockets/mars/mips/instructions/syscalls/SyscallSocketRead.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketRead.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallSocketRead.java	2015-02-27 01:20:14.089311435 -0500
+@@ -0,0 +1,46 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallSocketRead extends AbstractSyscall {
++    public SyscallSocketRead() {
++        super(102, "SocketRead");
++    }
++        
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd =  RegisterFile.getValue(4);
++        int buffAddr = RegisterFile.getValue(5);
++        int maxLen = RegisterFile.getValue(6);
++
++        byte[] buff = new byte[maxLen];
++
++        try {
++            int bytesRead = Sockets.getSocket(fd).getInputStream().read(buff);
++        } catch (IOException e) {
++            e.printStackTrace();
++            System.out.println(e.toString());
++            throw new ProcessingException();
++        }
++
++        for (int i = 0; i < maxLen; i++) {
++            // TODO: Make sure this actually writes as expected. May be limited to byte-aligned writing, which
++            // will require some fancy bit-string flicking
++            try { 
++                Globals.memory.setByte(buffAddr++, buff[i]);
++            } catch (Exception e) {
++                System.out.println("Choked on address: " + buffAddr);
++                e.printStackTrace();
++                throw new ProcessingException();
++            }
++        }
++    }
++}
+diff -rupN -x '*.class' mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketWrite.java mars-sockets/mars/mips/instructions/syscalls/SyscallSocketWrite.java
+--- mars-vanilla/mars/mips/instructions/syscalls/SyscallSocketWrite.java	1969-12-31 19:00:00.000000000 -0500
++++ mars-sockets/mars/mips/instructions/syscalls/SyscallSocketWrite.java	2015-03-17 17:04:10.282758533 -0400
+@@ -0,0 +1,42 @@
++package mars.mips.instructions.syscalls;
++import mars.util.*;
++import mars.mips.hardware.*;
++import mars.simulator.*;
++import mars.*;
++
++import java.net.Socket;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++
++
++public class SyscallSocketWrite extends AbstractSyscall {
++    public SyscallSocketWrite() {
++        super(101, "SocketWrite");
++    }
++
++    public void simulate(ProgramStatement statement) throws ProcessingException {
++        int fd = RegisterFile.getValue(4);
++        int addr = RegisterFile.getValue(5);
++        int maxLen = RegisterFile.getValue(6);
++        InputStream is = null;
++        OutputStream os = null;
++        byte[] buff;
++
++        if (maxLen < 0) {
++            System.out.println("Reading to double CRLF");
++            buff = SocketUtils.readToDoubleCRLF(addr, 16384); // increase this as necessary!
++        } else {
++            System.out.println("Reading to length");
++            buff = SocketUtils.readToLength(addr, maxLen);
++        }
++
++        try {
++            Sockets.getSocket(fd).getOutputStream().write(buff);
++            RegisterFile.updateRegister(3, buff.length);
++        } catch(Exception e) {
++            RegisterFile.updateRegister(3, -1);
++        }
++    }
++}
