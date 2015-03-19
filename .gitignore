@@ -1,0 +1,7 @@
+# How about some starters to ignore
+.DS_Store
+*.*~
+bin
+*.class
+
+# Needs to be extended to cover all code and projects as applicable
