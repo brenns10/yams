@@ -2,12 +2,12 @@
 YAMS: Awesome MIPS Server
 
 ## Team HKNSoc (pronounced “hack-in-sock”)
-  - Stephen Brennan (smb196 @brenns10)
-  - Katherine Cass (krc53 @k4therin2)
-  - Jeffrey Copeland (jpc86 @jpcjr)
-  - Andrew Mason (ajm188 @ajm188)
-  - Thomas Murphy (trm70 @thomasrussellmurphy)
-  - Aaron Neyer (agn31 @Aaronneyer)
+  - Stephen Brennan (smb196)
+  - Katherine Cass (krc53)
+  - Jeffrey Copeland (jpc86)
+  - Andrew Mason (ajm188)
+  - Thomas Murphy (trm70)
+  - Aaron Neyer (agn31)
 
 ## Description
 The goal of this project is to write a static HTTP server in MIPS and MARS. The server will consume a root content directory and a port. The server will then serve the website which will be viewable from the browser. Sockets will be used for networking and will be available in MIPS by extending MARS syscalls.
