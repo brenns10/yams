@@ -4,4 +4,7 @@
 bin
 *.class
 
+# Don't scoop up Modded MARS
+mars-sockets/
+
 # Needs to be extended to cover all code and projects as applicable
