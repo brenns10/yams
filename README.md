@@ -38,7 +38,7 @@ Assignments are general and collaboration is important.
 
 ### How to Run Modded MARS
 This has been tested on Linux, but not Mac.  Certainly not Windows.
-  - Run the shell script `./get_modded_mars.sh`
+  - Run `make mars`
   - Call `java -jar Mars4_5-SockMod.jar` (or double click the JAR, or something)
   - If you have trouble, check the Google Drive folder for a premade copy.
   - Enjoy!
