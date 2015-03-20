@@ -3,6 +3,7 @@
 *.*~
 bin
 *.class
+*.jar
 
 # Don't scoop up Modded MARS
 mars-sockets/
