@@ -36,3 +36,7 @@ Assignments are general and collaboration is important.
     - [ ] Magic POST field for Whitespace interpretation
   - [ ] Report: due 5/1, by all
 
+### How to Run Modded MARS
+  - From the project root, run `cd mars-sockets`.
+  - Call `java Mars`.
+  - Enjoy.
