@@ -20,3 +20,11 @@ for java_file in $(find $MARS_DIR/$SYSCALL_DIR -type f -newer $TOUCHED_FILE); do
 done
 
 rm -f $TOUCHED_FILE
+
+# Create a Jar!  Reuse the script that comes with MARS.  It says it's a bash
+# script, but it's really just a single command saved in a text file.
+cd $MARS_DIR
+sh CreateMarsJar.bat
+mv Mars.jar ../Mars4_5-SockMod.jar
+cd ..
+rm -rf $MARS_DIR
