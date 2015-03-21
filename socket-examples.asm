@@ -88,7 +88,7 @@ localhost: .asciiz	"localhost"
 google: .asciiz		"google.com"
 req:	.ascii		"GET /index.html HTTP/1.1\r\nHost: google.com\r\n\r\n"
 req_end:
-hwhtml:	.ascii		"<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>"
+hwhtml:	.ascii		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 73\r\nConnection: close\r\n\r\n<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>" 
 hwhtml_end:
 buff:	.byte	        0:MAX_LEN
 ln:	.asciiz		"\n"
