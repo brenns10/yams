@@ -24,18 +24,13 @@ public class SyscallSocketWrite extends AbstractSyscall {
         OutputStream os = null;
         byte[] buff;
 
-        if (maxLen < 0) {
-            System.out.println("Reading to double CRLF");
-            buff = SocketUtils.readToDoubleCRLF(addr, 16384); // increase this as necessary!
-        } else {
-            System.out.println("Reading to length");
-            buff = SocketUtils.readToLength(addr, maxLen);
-        }
+        buff = SocketUtils.readToLength(addr, maxLen);
 
         try {
             Sockets.getSocket(fd).getOutputStream().write(buff);
             RegisterFile.updateRegister(3, buff.length);
         } catch(Exception e) {
+            e.printStackTrace();
             RegisterFile.updateRegister(3, -1);
         }
     }

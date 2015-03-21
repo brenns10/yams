@@ -19,13 +19,13 @@
 
 # I was also playing around with macros while playing around with sockets. They can
 # make the code more C-like, but they have weird properties (i.e. can't accept a literal -1
-# as an argument.
-.macro exit (%exit_val)
+# as an argument.)
+.macro exit(%exit_val)
 	la $a0, %exit_val
-	li $v0, 10
+	li $v0, 17
 	syscall
 .end_macro
-.macro print (%str_addr)
+.macro print(%str_addr)
 	la $a0, %str_addr
 	li $v0, 4
 	syscall
@@ -35,85 +35,128 @@
 	syscall
 .end_macro
 
+
 # Socket Macros
-.macro sock_open (%addr, %port)
-	la $a0, %addr
-	li $a1, %port
+.macro sock_open(%dest_sock_reg)
 	li $v0, SOCK_OPEN
 	syscall  #open
+	move %dest_sock_reg, $v1
 .end_macro
-.macro sock_write (%data, %max_len)
-	move $a0, $s1
-	la $a1, %data
-	li $a2, %max_len
+.macro sock_write(%sock_reg)
+	move $a0, %sock_reg
 	li $v0, SOCK_WRITE
 	syscall  # write
 .end_macro
-.macro sock_read (%buff, %max_len)
-	move $a0, $s1
-	la $a1, %buff
-	li $a2, %max_len
+.macro sock_read(%sock_reg)
+	move $a0, %sock_reg
 	li $v0, SOCK_READ  # read
 	syscall
 .end_macro
-.macro sock_close
-	move $a0, $s1
+.macro sock_close(%sock_reg)
+	move $a0, %sock_reg
 	li $v0, SOCK_CLOSE
 	syscall
 .end_macro
-.macro ssock_open (%port)
-	li $a0, %port
+
+.macro ssock_open(%dest_ssock_reg)
 	li $v0, SERVER_SOCK_OPEN
 	syscall
+	move %dest_ssock_reg, $v1
 .end_macro
-.macro ssock_bind (%hostnameAddr)
-	move $a0, $s0
+.macro ssock_bind(%ssock_reg, %hostname_addr)
+	move $a0, %ssock_reg
 	la $a1, %hostnameAddr
 	li $v0, SERVER_SOCK_BIND
 	syscall
 .end_macro
-.macro ssock_accept
-	move $a0, $s0
+.macro ssock_accept(%ssock_reg, %dest_reg)
+	move $a0, %ssock_reg
 	li $v0, SERVER_SOCK_ACCEPT
 	syscall
+	move %dest_reg, $v1
 .end_macro
-.macro ssock_close
-	move $a0, $s0
+.macro ssock_close(%ssock_reg)
+	move $a0, %ssock_reg
 	li $v0, SERVER_SOCK_CLOSE
 	syscall
 .end_macro
 
-.eqv	NEG_ONE		0xFFFFFFFF  # hackity hack hack hack. macro expansions don't like '-1' for some reason
 .eqv	MAX_LEN		16384
 
 .data
 localhost: .asciiz	"localhost"
 google: .asciiz		"google.com"
-req:	.asciiz		"GET /index.html HTTP/1.1\r\nHost: google.com\r\n\r\n"
-hwhtml:	.asciiz		"<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>\r\n\r\n"
+req:	.ascii		"GET /index.html HTTP/1.1\r\nHost: google.com\r\n\r\n"
+req_end:
+hwhtml:	.ascii		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 73\r\nConnection: close\r\n\r\n<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>" 
+hwhtml_end:
 buff:	.byte	        0:MAX_LEN
+ln:	.asciiz		"\n"
 .text
 .globl	main
 main:
-	jal serve_hw
+	jal serve_hw	# serves a demo HTML page to "localost:19001"
+	#jal get_google	# prints content of "google.com/index.html" to console
 	exit(0)
-get_google:
-	sock_open(google, 80)
-	move $s1, $v1    # To retrieve the socket's FD
-	sock_write(req, MAX_LEN)
-	sock_read(buff, MAX_LEN)
-	sock_close
-	print(buff)
-	jr $ra
 serve_hw:
-	ssock_open(19001)
-	move $s0, $v1  # move server socket FD to safe place
-	ssock_accept
-	move $s1, $v1  # get client socket FD
-	sock_read(buff, MAX_LEN)
-	print(buff)  # print for debugging
-	sock_write(hwhtml, NEG_ONE)  # writing to -1 means "read to double CRLF"
-	sock_close()
-	ssock_close()
+	li $a0, 19001
+	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
+	ssock_accept($s0, $s1)	# accept connection, store client FD in $s1
+
+	# Read in HTTP request
+	la $a1, buff
+	li $a2, MAX_LEN
+	sock_read($s1)		# read up to MAX_LEN bytes into buff from socket w/ FD in $s1
+	print(buff)		# print for debugging
+
+	# Write our pre-made response to client
+	la $a1, hwhtml
+	# compute length of hwhtml
+	la $a2, hwhtml_end
+	sub $a2, $a2, $a1
+	sock_write($s1)		# write $a2 bits from the buffer at $a1
+
+	# view the number of bytes written (-1 == error)
+	move $a0, $v1
+	print_int
+	print(ln)
+	
+	# close client and server sockets
+	sock_close($s1)
+	ssock_close($s0)
 	jr $ra
 	
+
+get_google:
+	# open socket to google.com:80
+	la $a0, google
+	li $a1, 80
+	sock_open($s1)
+	
+	# view the FD
+	move $a0, $s1
+	print_int
+	print(ln)
+
+	# Request index.html from gogle
+	la $a1, req
+	# compute length of req
+	la $a2, req_end
+	sub $a2, $a2, $a1
+	sock_write($s1)
+
+	# view the number of bytes written (-1 == error)
+	move $a0, $v1
+	print_int
+	print(ln)
+
+	# Read google's response
+	la $a1, buff
+	li $a2, MAX_LEN
+	sock_read($s1)
+
+	# close, print, and exit
+	sock_close($s1)
+	nop
+	print(buff)
+	jr $ra	
