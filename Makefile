@@ -30,7 +30,7 @@ $(VANILLA_JAR):
 	wget $(MARS_URL)
 
 # Rule for extracting the JAR.
-$(MARS_DIR)/CreateMarsJar.bat:
+$(MARS_DIR)/CreateMarsJar.bat: $(VANILLA_JAR)
 	mkdir -p $(MARS_DIR)
 	cd $(MARS_DIR); jar xf ../$(VANILLA_JAR)
 
