@@ -50,40 +50,5 @@ public final class SocketUtils {
         }
         return buff;
     }
-
-    private static byte[] rotateFourBytes(byte[] bytes, byte newByte) {
-        bytes[0] = bytes[1];
-        bytes[1] = bytes[2];
-        bytes[2] = bytes[3];
-        bytes[3] = newByte;
-        return bytes;
-    }
-
-    private static boolean isDoubleCRLF(byte[] bytes) {
-        final byte CR = 13; //(byte)'\r';
-        final byte LF = 10; //(byte)'\n';
-        return (bytes[0] == CR && bytes[1] == LF && bytes[2] == CR && bytes[3] == LF);
-    }
-
-    public static byte[] readToDoubleCRLF(int addr, int maxLen) {
-        byte[] buff = new byte[maxLen];
-        byte[] lastFourBytes = new byte[]{0, 0, 0, 0};
-
-        for (int i = 0; i < maxLen; i++) {
-            try {
-                byte b = (byte)Globals.memory.getByte(addr++);
-                buff[i] = b;
-                rotateFourBytes(lastFourBytes, b);
-                if (isDoubleCRLF(lastFourBytes)) {
-                    break;
-                }
-            } catch (AddressErrorException e) {
-                System.out.println("Choked on address: " + addr);
-                break;
-            }
-        }
-
-        return buff;
-    }
 }
 
