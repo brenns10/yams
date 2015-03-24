@@ -13,22 +13,22 @@
 # Socket Macros
 .macro sock_open(%dest_sock_reg)
 	li $v0, SOCK_OPEN
-	syscall  #open
+	syscall
 	move %dest_sock_reg, $v1
 .end_macro
 .macro sock_write(%sock_reg)
-	move $a0, %sock_reg
 	li $v0, SOCK_WRITE
-	syscall  # write
+	move $a0, %sock_reg
+	syscall
 .end_macro
 .macro sock_read(%sock_reg)
+	li $v0, SOCK_READ
 	move $a0, %sock_reg
-	li $v0, SOCK_READ  # read
 	syscall
 .end_macro
 .macro sock_close(%sock_reg)
-	move $a0, %sock_reg
 	li $v0, SOCK_CLOSE
+	move $a0, %sock_reg
 	syscall
 .end_macro
 
@@ -38,19 +38,19 @@
 	move %dest_ssock_reg, $v1
 .end_macro
 .macro ssock_bind(%ssock_reg, %hostname_addr)
+	li $v0, SERVER_SOCK_BIND
 	move $a0, %ssock_reg
 	la $a1, %hostname_addr
-	li $v0, SERVER_SOCK_BIND
 	syscall
 .end_macro
 .macro ssock_accept(%ssock_reg, %dest_reg)
-	move $a0, %ssock_reg
 	li $v0, SERVER_SOCK_ACCEPT
+	move $a0, %ssock_reg
 	syscall
 	move %dest_reg, $v1
 .end_macro
 .macro ssock_close(%ssock_reg)
-	move $a0, %ssock_reg
 	li $v0, SERVER_SOCK_CLOSE
+	move $a0, %ssock_reg
 	syscall
 .end_macro
