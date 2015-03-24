@@ -5,26 +5,29 @@
 .eqv	FILE_CLOSE	16
 
 # File Macros
-.macro file_open(%filename, %flags, %mode)
+.macro file_open(%filename, %flags, %mode, %result_reg)
 	li $v0, FILE_OPEN
 	la $a0, %filename
 	li $a1, %flags
 	li $a2, %mode
 	syscall
+	move %result_reg, $v0
 .end_macro
-.macro file_write(%filedesc, %buffer_address, %max_write_length)
+.macro file_write(%filedesc, %buffer_address, %max_write_length, %result_reg)
 	li $v0, FILE_WRITE
 	move $a0, %filedesc
 	la $a1, %buffer_address
 	li $a2, %max_write_length
 	syscall
+	move %result_reg, $v0
 .end_macro
-.macro file_read(%filedesc, %buffer_address, %max_read_length)
+.macro file_read(%filedesc, %buffer_address, %max_read_length, %result_reg)
 	li $v0, FILE_READ
 	move $a0, %filedesc
 	la $a1, %buffer_address
 	li $a2, %max_read_length
 	syscall
+	move %result_reg, $v0
 .end_macro
 .macro file_close(%filedesc)
 	li $v0, FILE_CLOSE
