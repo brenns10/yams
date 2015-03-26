@@ -82,3 +82,22 @@ _strcmp_ne:
         # $t0 != $t1:
         sub $v0, $t0, $t1
         jr $ra
+
+
+        # memcpy: Move n bytes from a source buffer to a destination buffer.
+        # Parameters:
+        #   $a0: Address of destination buffer.
+        #   $a1: Address of source buffer.
+        #   $a2: Number of bytes to write.
+        # Returns: Nothing.
+        # Note: none of the parameters are preserved on return.
+memcpy:
+        beq $a2, $zero, _memcpy_return
+        lbu $t0, 0($a1)
+        sb  $t0, 0($a0)
+        addi $a0, $a0, 1
+        addi $a1, $a1, 1
+        addi $a2, $a2, -1
+        j memcpy
+_memcpy_return:
+        jr $ra
