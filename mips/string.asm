@@ -18,12 +18,12 @@ str_index_of:
 _sio_loop:
         lbu $t0, 0($v0)
         beq $t0, $a1, _sio_return
-        beq $zero, $a1, _sio_none
+        beq $t0, $zero, _sio_none
         addi $v0, $v0, 1
         j _sio_loop
 _sio_return:
         sub $v0, $v0, $a0
         jr $ra
 _sio_none:
-        ori $v0, $v0, -1
+        li $v0, -1
         jr $ra
