@@ -55,3 +55,30 @@ _strncpy_overflow:
 _strncpy_return:
         sub $v0, $t0, $a0
         jr $ra
+
+
+        # strcmp: Compare two strings and return <0 if the first is less than
+        #         the second, >0 if vice versa, or 0 if they are the same.
+        # Parameters:
+        #   $a0: Address of first string.
+        #   $a1: Address of second string.
+        # Returns:
+        #   $v0: Value as described above.
+strcmp:
+        lb $t0, 0($a0)
+        lb $t1, 0($a1)
+        bne $t0, $t1, _strcmp_ne
+        # $t0 == $t1:
+        bne $t0, $zero, _strcmp_equal_continue
+        # $t0 == $t1 == '\0':
+        move $v0, $zero
+        jr $ra
+_strcmp_equal_continue:
+        # $t0 == $t1 != '\0':
+        addi $a0, $a0, 1
+        addi $a1, $a1, 1
+        j strcmp
+_strcmp_ne:
+        # $t0 != $t1:
+        sub $v0, $t0, $t1
+        jr $ra
