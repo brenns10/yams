@@ -26,7 +26,3 @@
 	addi	$sp, $sp, -4
 	lw	%dst_reg, 0($sp)
 .end_macro
-
-.macro min(%reg1, %reg2)
-	
-.end_macro
