@@ -17,6 +17,9 @@ test_str2:      .asciiz "abc"
 test_str3:      .asciiz "abd"
 test_str4:      .asciiz "abcd"
 test_str5:      .asciiz "abc"
+test_str6:      .asciiz "ab"
+test_buf:       .space 4
+
 
 .text
 .globl main
@@ -25,6 +28,9 @@ main:
         print(test_start)
         jal test_str_index_of_exists
         jal test_str_index_of_none
+        jal test_strncpy_same_size
+        jal test_strncpy_too_big
+        jal test_strncpy_small
         jal test_strcmp_eq_samelen
         jal test_strcmp_ne_samelen
         jal test_strcmp_ne_difflen
@@ -60,6 +66,49 @@ test_str_index_of_none:
         li $t0, -1
         bne $v0, $t0, fail
         j pass
+
+#################################### STRNCPY ###################################
+
+test_strncpy_same_size:
+        la $a0, test_buf
+        la $a1, test_str2
+        li $a2, 4
+        push($ra)
+        jal strncpy
+        li $t0, 4               # expect 4 bytes written
+        bne $v0, $t0, fail
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail    # expect that the strings are the same.
+        j pass
+
+test_strncpy_too_big:
+        la $a0, test_buf
+        la $a1, test_str4
+        li $a2, 4
+        push($ra)
+        jal strncpy
+        li $t0, 4               # expect 4 bytes written
+        bne $v0, $t0, fail
+        la $a1, test_str2
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail    # expect the buffer contains a small portion
+        j pass
+
+test_strncpy_small:
+        la $a0, test_buf
+        la $a1, test_str6
+        li $a2, 4
+        push($ra)
+        jal strncpy
+        li $t0, 3               # expect 3 bytes written
+        bne $v0, $t0, fail
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail    # expect that the strings are the same.
+        j pass
+
 
 #################################### STRCMP ####################################
 
