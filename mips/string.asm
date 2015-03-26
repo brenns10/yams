@@ -27,3 +27,31 @@ _sio_return:
 _sio_none:
         li $v0, -1
         jr $ra
+
+
+        # strncpy: Copies at most 'n' bytes of a string into another buffer.
+        # Parameters:
+        #   $a0: Address of destination buffer.
+        #   $a1: Address of source buffer.
+        #   $a2: Number of bytes to write in destination buffer (including null
+        #        byte).
+        # Returns:
+        #   $v0: Number of characters written out (including null byte).
+strncpy:
+        move $t0, $a0       # $t0: pointer to current destination byte
+        move $t1, $a1       # $t1: pointer to current source byte
+        add  $t2, $a0, $a2  # $t2: 1 byte past the last write
+_strncpy_loop:
+        beq $t0, $t2, _strncpy_overflow   # Stop if we're about to write too far
+        lbu $t3, 0($t1)  # load
+        sb  $t3, 0($t0)  # write
+        addi $t0, $t0, 1
+        addi $t1, $t1, 1
+        beq $t3, $zero, _strncpy_return   # Return if we hit a null terminator
+        j _strncpy_loop
+_strncpy_overflow:
+        addi $t2, $t2, -1
+        sb $zero, 0($t2)
+_strncpy_return:
+        sub $v0, $t0, $a0
+        jr $ra
