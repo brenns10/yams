@@ -8,7 +8,7 @@
 
 .data
 test_pass:      .asciiz "TEST PASSED.\n"
-test_fail:      .asciiz "TEST FAILED.\n"
+test_fail:      .asciiz "==> TEST FAILED!\n"
 test_start:     .asciiz "STARTING TESTS.\n"
 test_end:       .asciiz "FINISHED TESTS.\n"
 
