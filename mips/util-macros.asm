@@ -11,6 +11,12 @@
 	syscall
 .end_macro
 
+.macro print_reg(%reg_addr)
+	move $a0, %reg_addr
+	li $v0, 4
+	syscall
+.end_macro
+
 .macro print_int(%src_reg)
 	move $a0, %src_reg
 	li $v0, 1
