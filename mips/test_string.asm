@@ -18,7 +18,11 @@ test_str3:      .asciiz "abd"
 test_str4:      .asciiz "abcd"
 test_str5:      .asciiz "abc"
 test_str6:      .asciiz "ab"
+test_str7:      .asciiz "abcdtitive string with many t's."
+
+# These are allowed to be modified.
 test_buf:       .space 4
+test_buf2:      .asciiz "Repetitive string with many t's."
 
 
 .text
@@ -34,6 +38,7 @@ main:
         jal test_strcmp_eq_samelen
         jal test_strcmp_ne_samelen
         jal test_strcmp_ne_difflen
+        jal test_memcpy
         print(test_end)
         exit(0)
 
@@ -137,6 +142,22 @@ test_strcmp_ne_difflen:
         jal strcmp
         pop($ra)
         bgez $v0, fail
+        j pass
+
+
+#################################### MEMCPY ####################################
+
+test_memcpy:
+        la $a0, test_buf2
+        la $a1, test_str4
+        li $a2, 4
+        push($ra)
+        jal memcpy              # Copy "abcd" into "Repetitive "....string
+	la $a0, test_buf2
+        la $a1, test_str7
+        jal strcmp              # Now compare against expected string
+        pop($ra)
+        bne $v0, $zero, fail
         j pass
 
 .include "string.asm"
