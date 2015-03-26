@@ -21,6 +21,7 @@
 	syscall
 	move %result_reg, $v0
 .end_macro
+
 .macro file_read(%filedesc, %buffer_address, %max_read_length, %result_reg)
 	li $v0, FILE_READ
 	move $a0, %filedesc
@@ -29,6 +30,7 @@
 	syscall
 	move %result_reg, $v0
 .end_macro
+
 .macro file_write(%filedesc, %buffer_address, %max_write_length, %result_reg)
 	li $v0, FILE_WRITE
 	move $a0, %filedesc
@@ -37,6 +39,7 @@
 	syscall
 	move %result_reg, $v0
 .end_macro
+
 .macro file_close(%filedesc)
 	li $v0, FILE_CLOSE
 	move $a0, %filedesc
