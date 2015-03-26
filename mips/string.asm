@@ -13,6 +13,7 @@
         #   $a1: Character to find first instance of.
         # Returns:
         #   $v0: Index of first occurrence, or -1.
+        # Note: parameters are preserved.
 str_index_of:
         move $v0, $a0
 _sio_loop:
@@ -37,6 +38,7 @@ _sio_none:
         #        byte).
         # Returns:
         #   $v0: Number of characters written out (including null byte).
+        # Note: parameters are preserved.
 strncpy:
         move $t0, $a0       # $t0: pointer to current destination byte
         move $t1, $a1       # $t1: pointer to current source byte
@@ -64,6 +66,7 @@ _strncpy_return:
         #   $a1: Address of second string.
         # Returns:
         #   $v0: Value as described above.
+        # Note: none of the parameters are preserved on return.
 strcmp:
         lb $t0, 0($a0)
         lb $t1, 0($a1)
