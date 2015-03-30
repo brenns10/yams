@@ -26,11 +26,11 @@ req_loop:
 	ssock_accept($s0, $s1)	# accept connection from server_socket in $s0, store client FD in $s1
 	
 	# read & parse a single request
-	move $a0, $s1
+	move $a0, $s1	# requires the server socket FD in $a0
 	jal get_request
 	
-	move $s2, $v0	# request type, one of HTTP_GET, HTTP_POST, HTTP_OTHER, HTTP_ERROR
-	move $s3, $v1	# req_uri addr
+	move $s2, $v0	# request type, one of HTTP_GET (0), HTTP_POST (1), HTTP_OTHER (2), HTTP_ERROR (3)
+	move $s3, $v1	# Holds buffer with request URI
 	
 	print(msg0)
 	print_int($s2)
