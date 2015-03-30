@@ -19,6 +19,7 @@
 
 .data
 # Print-out strings
+_gr_msg0: .asciiz	"Full Request:\n"
 _gr_msg1: .asciiz	"$s7 = <len of method> = "
 _gr_msg2: .asciiz	"$s6 = <len of URI> = "
 
@@ -61,30 +62,29 @@ get_request:
 	sock_read($s1)
 
 	# print whole request for debugging
+	print(_gr_msg0)
 	print(req_buff)
 	print(ln)
 
 	# confirm we got at least the header (i.e. check for doubleCRLF)
-	la $t0, str_header_prefix_Host
-	la $t1, str_header_prefix_Host_end
-	sub $t1, $t1, $t0
-	print_int($t1)
+	#la $t0, str_header_prefix_Host
+	#la $t1, str_header_prefix_Host_end
+	#sub $t1, $t1, $t0
+	#print_int($t1)
 
-	la $a0, req_buff
-	la $a1, str_header_prefix_Host
-	la $a2, str_header_prefix_Host_end
-	sub $a2, $a2, $a1
-
-	jal _substr_index_of
-
-	move $t1, $v0
-	la $t0, req_buff
-	sub $t0, $v0, $t0
-	print_reg($t1)
-	print(ln)
-	print(ln)
-	print_int($t0)
-	print(ln)
+	#la $a0, req_buff
+	#la $a1, str_header_prefix_Host
+	#la $a2, str_header_prefix_Host_end
+	#sub $a2, $a2, $a1
+	#jal _substr_index_of
+	#move $t1, $v0
+	#la $t0, req_buff
+	#sub $t0, $v0, $t0
+	#print_reg($t1)
+	#print(ln)
+	#print(ln)
+	#print_int($t0)
+	#print(ln)
 
 	# if we did not get the whole header, drop this request on the floor
 	# check for Transfer-Encoding
@@ -109,12 +109,12 @@ get_request:
 	bltz req_uri_len, _get_request_error	# -1 return --> character not found
 
 	# print out length of request method, uri for debugging
-	print(_gr_msg1)
-	print_int(req_method_len)
-	print(ln)
-	print(_gr_msg2)
-	print_int(req_uri_len)
-	print(ln)
+	#print(_gr_msg1)
+	#print_int(req_method_len)
+	#print(ln)
+	#print(_gr_msg2)
+	#print_int(req_uri_len)
+	#print(ln)
 
 	# copy the request method
 	la $a0, req_method_buff
