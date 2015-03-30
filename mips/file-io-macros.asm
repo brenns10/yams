@@ -15,7 +15,7 @@
 # File Macros
 .macro file_open(%filename, %flags, %mode, %result_reg)
 	li $v0, FILE_OPEN
-	la $a0, %filename
+	move $a0, %filename
 	li $a1, %flags
 	li $a2, %mode
 	syscall
@@ -34,7 +34,7 @@
 .macro file_write(%filedesc, %buffer_address, %max_write_length, %result_reg)
 	li $v0, FILE_WRITE
 	move $a0, %filedesc
-	la $a1, %buffer_address
+	move $a1, %buffer_address
 	move $a2, %max_write_length
 	syscall
 	move %result_reg, $v0

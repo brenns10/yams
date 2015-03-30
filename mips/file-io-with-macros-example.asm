@@ -21,18 +21,20 @@ bytes_read:	.asciiz	"Bytes Read: "
 	.text
 .globl	main
 main:
+	la $t0, write_out_name  # load the filename pointer into a register
 	# Open the file with name in write_out_name
-	# Save descriptor value in $s0 
-	file_open(write_out_name, FILE_OPEN_WRITE, FILE_NULL_MODE, $s0)
+	# Save descriptor value in $s0
+	file_open($t0, FILE_OPEN_WRITE, FILE_NULL_MODE, $s0)
 	
 	# Determine length of data to write in $t0
 	la $t0, write_out_data
 	la $t1, write_out_data_end
-	sub $t0, $t1, $t0
+	sub $t1, $t1, $t0  # computation
+	la $t0, write_out_data  # load the buffer pointer 
 	
-	# Write out to file in $s0 the data in the buffer
+	# Write out to file descriptor in $s0 the data in the buffer
 	# Save chars written count in $s1
-	file_write($s0, write_out_data, $t0, $s1)
+	file_write($s0, $t0, $t1, $s1)
 	
 	print(bytes_written)
 	move $a0, $s1
@@ -42,9 +44,10 @@ main:
 	# Close the file descriptor in $s0
 	file_close($s0)
 	
+	la $t0, read_in_name # load the filename pointer into a register
 	# Open the file with name in read_in_name
 	# Save descriptor value in $s0 
-	file_open(read_in_name, FILE_OPEN_READ, FILE_NULL_MODE, $s0)
+	file_open($t0, FILE_OPEN_READ, FILE_NULL_MODE, $s0)
 	
 	# Read from file in $s0 into buff
 	# Save chars read in $s1
