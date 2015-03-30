@@ -10,16 +10,12 @@
 
 # module includes at bottom of file (otherwise entry point is messed up)
 
-.eqv	MAX_LEN		16384
-
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
 msg2:	.asciiz		"Request URI: "
 hwhtml:	.ascii		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 72\r\nConnection: close\r\n\r\n<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>"
 hwhtml_end:
-buff:	.byte	        0:MAX_LEN
-	.word		0
 ln:	.asciiz		"\n"
 .text
 .globl	main
