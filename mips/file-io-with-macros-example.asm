@@ -24,7 +24,7 @@ main:
 	la $t0, write_out_name  # load the filename pointer into a register
 	# Open the file with name in write_out_name
 	# Save descriptor value in $s0
-	file_open($t0, FILE_OPEN_WRITE, FILE_NULL_MODE, $s0)
+	file_open($t0, FILE_OPEN_WRITE, $s0)
 	
 	# Determine length of data to write in $t0
 	la $t0, write_out_data
@@ -47,7 +47,7 @@ main:
 	la $t0, read_in_name # load the filename pointer into a register
 	# Open the file with name in read_in_name
 	# Save descriptor value in $s0 
-	file_open($t0, FILE_OPEN_READ, FILE_NULL_MODE, $s0)
+	file_open($t0, FILE_OPEN_READ, $s0)
 	
 	# Read from file in $s0 into buff
 	# Save chars read in $s1

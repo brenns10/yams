@@ -13,11 +13,11 @@
 .eqv	FILE_NULL_MODE	0
 
 # File Macros
-.macro file_open(%filename, %flags, %mode, %result_reg)
+.macro file_open(%filename, %flags, %result_reg)
 	li $v0, FILE_OPEN
 	move $a0, %filename
 	li $a1, %flags
-	li $a2, %mode
+	li $a2, FILE_NULL_MODE
 	syscall
 	move %result_reg, $v0
 .end_macro
