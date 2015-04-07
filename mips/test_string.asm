@@ -44,6 +44,7 @@ main:
         jal test_atoi
         jal test_htoi
         jal test_strncmp
+        jal test_strlen
         print(test_end)
         exit(0)
 
@@ -197,6 +198,17 @@ test_strncmp:
         jal strncmp
         pop($ra)
         bne $v0, $zero, fail
+        j pass
+
+#################################### STRLEN ####################################
+
+test_strlen:
+        la $a0, test_str9
+        push($ra)
+        jal strlen
+        pop($ra)
+        li $t0, 8
+        bne $v0, $t0, fail
         j pass
 
 .include "string.asm"
