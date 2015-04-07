@@ -104,3 +104,24 @@ memcpy:
         j memcpy
 _memcpy_return:
         jr $ra
+
+
+        # atoi: Convert a decimal string into an integer.
+        # Parameters:
+        #   $a0: Address of null-terminated decimal string.
+        # Returns:
+        #   $v0: Value of string.
+atoi:
+        move $v0, $zero
+        li  $t0, 10
+_atoi_loop:
+        lbu $t1, 0($a0)                 # load the character
+        beq $t1, $zero, _atoi_return    # stop at null terminator
+        mult $v0, $t0                   # move up result by one decimal place
+        mflo $v0
+        subi $t1, $t1, '0'              # get character value
+        add $v0, $v0, $t1               # add character value to result
+        addi $a0, $a0, 1                # increment string pointer
+        j _atoi_loop
+_atoi_return:
+        jr $ra
