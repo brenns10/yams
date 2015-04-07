@@ -125,3 +125,35 @@ _atoi_loop:
         j _atoi_loop
 _atoi_return:
         jr $ra
+
+
+        # htoi: Convert a hexadecimal string into an integer.
+        # Parameters:
+        #   $a0: Address of null-terminated, positive hex string.
+        # Returns:
+        #   $v0: Value of string.
+        # Notes: Suports upper or lower case.  No error handling, or whitespace.
+htoi:
+        move $v0, $zero
+        li   $t1, 'a'
+        li   $t2, 'A'
+_htoi_loop:
+        lbu  $t0, 0($a0)
+        addi $a0, $a0, 1
+        beq  $t0, $zero, _htoi_return
+        sll  $v0, $v0, 4
+        bge  $t0, $t1, _htoi_lc
+        bge  $t0, $t2, _htoi_uc
+        subi $t0, $t0, '0'
+        add  $v0, $v0, $t0
+        j    _htoi_loop
+_htoi_uc:
+        addi $t0, $t0, -55
+        add  $v0, $v0, $t0
+        j    _htoi_loop
+_htoi_lc:
+        addi $t0, $t0, -87
+        add  $v0, $v0, $t0
+        j    _htoi_loop
+_htoi_return:
+        jr   $ra
