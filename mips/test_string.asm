@@ -43,6 +43,7 @@ main:
         jal test_memcpy
         jal test_atoi
         jal test_htoi
+        jal test_strncmp
         print(test_end)
         exit(0)
 
@@ -183,6 +184,19 @@ test_htoi:
         pop($ra)
         li $t0, 0xDEADBEEF
         bne $v0, $t0, fail
+        j pass
+
+
+################################### STRNCPY ####################################
+
+test_strncmp:
+        la $a0, test_str4
+        la $a1, test_str7
+        li $a2, 4
+        push($ra)
+        jal strncmp
+        pop($ra)
+        bne $v0, $zero, fail
         j pass
 
 .include "string.asm"
