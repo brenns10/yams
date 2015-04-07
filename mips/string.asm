@@ -190,3 +190,21 @@ _strncmp_ne:
         # $t0 != $t1:
         sub $v0, $t0, $t1
         jr $ra
+
+
+        # strlen: Returns the length of the string in $a0 (not including null
+        #         terminating byte).
+        # Parameters:
+        #   $a0: Address of null terminated string.
+        # Return:
+        #   $v0: Number of characters in the string.
+strlen:
+        move $v0, $zero
+_strlen_loop:
+        lb $t0, 0($a0)
+        beq $t0, $zero, _strlen_return
+        addi $v0, $v0, 1
+        addi $a0, $a0, 1
+        j _strlen_loop
+_strlen_return:
+        jr $ra
