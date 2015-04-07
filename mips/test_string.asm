@@ -20,6 +20,7 @@ test_str5:      .asciiz "abc"
 test_str6:      .asciiz "ab"
 test_str7:      .asciiz "abcdtitive string with many t's."
 test_str8:      .asciiz "12345"
+test_str9:      .asciiz "DeAdBeEf"
 
 # These are allowed to be modified.
 test_buf:       .space 4
@@ -41,6 +42,7 @@ main:
         jal test_strcmp_ne_difflen
         jal test_memcpy
         jal test_atoi
+        jal test_htoi
         print(test_end)
         exit(0)
 
@@ -171,6 +173,15 @@ test_atoi:
         jal atoi
         pop($ra)
         li $t0, 12345
+        bne $v0, $t0, fail
+        j pass
+
+test_htoi:
+        la $a0, test_str9
+        push($ra)
+        jal htoi
+        pop($ra)
+        li $t0, 0xDEADBEEF
         bne $v0, $t0, fail
         j pass
 
