@@ -268,3 +268,71 @@ _ssio_found:
         pop($ra)
         sub $v0, $t1, $a0       # Current address minus original address
         jr $ra
+
+
+        # strcat: Append two strings into a single buffer.
+        # Parameters:
+        #   $a0: The address of the prefix string (null-terminated).
+        #   $a1: The address of the suffix string (null-terminated).
+        #   $a2: The address of the destination buffer (hope you have room!)
+        # Returns: nothing
+        # Notes:
+        #  - $a0 may be the same address as $a2.
+        #  - $a0 may be the same address as $a1.
+        #  - $a1 MAY NOT be the same address as $a2.
+        #  - No other overlap between the buffers is allowed.
+strcat:
+        push($ra)       # We won't need this for a while.
+
+        push($a0)       # Save the parameters for first strlen call.
+        push($a1)
+        push($a2)
+        jal strlen      # Get the length of the prefix string.
+        push($v0)       # Save the length of the prefix string
+
+        # If $a0 == $a2, we don't need to copy the first string!
+        beq $a0, $a2, _strcat_copy_suffix
+
+        # Else, we should copy $a0 into $a2!
+        # I know this looks screwy, I'm popping all those values from earlier
+	# into different registers, and pushing them back in the same order.
+        pop($a2)        # This is the saved prefix length
+        pop($a0)        # This is the destination buffer
+        pop($t0)        # Save the suffix string real quick.
+        pop($a1)        # This is the source buffer
+        push($a1)       # Save all those values again
+        push($t0)
+        push($a0)
+        push($a2)
+        addi $a2, $a2, 1        # strncpy needs to include the nul byte
+        jal strncpy
+_strcat_copy_suffix:
+        # Increment the destination buffer to point to next open character.
+        pop($t0)        # The number of chars in prefix
+        pop($a2)        # Dest buffer
+        pop($a1)        # Suffix string
+        pop($a0)        # Prefix string
+        add $a2, $a2, $t0
+        push($a0)       # Prefix string
+        push($a1)       # Suffix string
+        push($a2)       # New dest addr
+
+        # Get the length of the suffix string
+        move $a0, $a1
+        jal strlen
+
+        # Now, use that length for strncpy from the suffix to the destination.
+        move $a2, $v0
+        pop($a0)
+        pop($a1)
+        push($a1)
+        push($a0)
+        addi $a2, $a2, 1        # strncpy needs to include the nul byte
+        jal strncpy
+
+        # Finally, we can pop everything out and return.
+        pop($t0)
+        pop($t0)
+        pop($t0)
+        pop($ra)
+        jr $ra

@@ -22,11 +22,17 @@ test_str7:      .asciiz "abcdtitive string with many t's."
 test_str8:      .asciiz "12345"
 test_str9:      .asciiz "DeAdBeEf"
 test_str10:     .asciiz "string"
+test_str11:     .asciiz "abcdstring"
+test_str12:     .asciiz "abcdabcd"
 
 # These are allowed to be modified.
 test_buf:       .space 4
 test_buf2:      .asciiz "Repetitive string with many t's."
-
+test_buf3:      .space 20
+test_buf4:      .asciiz "abcd"
+                .space 15
+test_buf5:      .asciiz "abcd"
+                .space 4
 
 .text
 .globl main
@@ -48,6 +54,9 @@ main:
         jal test_strlen
         jal test_ssio_found
         jal test_ssio_not_found
+        jal test_strcat
+        jal test_strcat_into_same
+        jal test_strcat_all_same
         print(test_end)
         exit(0)
 
@@ -234,6 +243,47 @@ test_ssio_not_found:
         pop($ra)
         li $t0, -1
         bne $v0, $t0, fail
+        j pass
+
+#################################### STRCAT ####################################
+
+test_strcat:
+        la $a0, test_str4       # "abcd"
+        la $a1, test_str10      # "string"
+        la $a2, test_buf3       # 20 byte space
+        push($ra)
+        jal strcat
+        la $a0, test_str11      # "abcdstring"
+        la $a1, test_buf3       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
+        j pass
+
+test_strcat_into_same:
+        la $a0, test_buf4       # "abcd" + 16 bytes
+        la $a1, test_str10      # "string"
+        la $a2, test_buf4       # "abcd" + 16 bytes
+        push($ra)
+        jal strcat
+        la $a0, test_str11      # "abcdstring"
+        la $a1, test_buf4       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
+        j pass
+
+test_strcat_all_same:
+        la $a0, test_buf5       # "abcd" + 16 bytes
+        la $a1, test_buf5       # "abcd" + 16 bytes
+        la $a2, test_buf5       # "abcd" + 16 bytes
+        push($ra)
+        jal strcat
+        la $a0, test_str12      # "abcdabcd"
+        la $a1, test_buf5       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
         j pass
 
 .include "string.asm"
