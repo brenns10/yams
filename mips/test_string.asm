@@ -24,6 +24,7 @@ test_str9:      .asciiz "DeAdBeEf"
 test_str10:     .asciiz "string"
 test_str11:     .asciiz "abcdstring"
 test_str12:     .asciiz "abcdabcd"
+test_str13:     .asciiz "abcdstr"
 
 # These are allowed to be modified.
 test_buf:       .space 4
@@ -33,6 +34,9 @@ test_buf4:      .asciiz "abcd"
                 .space 15
 test_buf5:      .asciiz "abcd"
                 .space 4
+test_buf6:      .space 20
+test_buf7:      .space 4
+test_buf8:      .space 8
 
 .text
 .globl main
@@ -57,6 +61,9 @@ main:
         jal test_strcat
         jal test_strcat_into_same
         jal test_strcat_all_same
+        jal test_strncat_plenty
+        jal test_strncat_lessthan_prefix
+        jal test_strncat_lessthan_suffix
         print(test_end)
         exit(0)
 
@@ -281,6 +288,48 @@ test_strcat_all_same:
         jal strcat
         la $a0, test_str12      # "abcdabcd"
         la $a1, test_buf5       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
+        j pass
+
+test_strncat_plenty:
+        la $a0, test_str4       # "abcd"
+        la $a1, test_str10      # "string"
+        la $a2, test_buf6       # 20 byte space
+        li $a3, 20
+        push($ra)
+        jal strncat
+        la $a0, test_str11      # "abcdstring"
+        la $a1, test_buf6       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
+        j pass
+
+test_strncat_lessthan_prefix:
+        la $a0, test_str4       # "abcd"
+        la $a1, test_str10      # "string"
+        la $a2, test_buf7       # 4 byte space
+        li $a3, 4
+        push($ra)
+        jal strncat
+        la $a0, test_str2       # "abc"
+        la $a1, test_buf7       # (destination buffer)
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
+        j pass
+
+test_strncat_lessthan_suffix:
+        la $a0, test_str4       # "abcd"
+        la $a1, test_str10      # "string"
+        la $a2, test_buf8       # 8 byte space
+        li $a3, 8
+        push($ra)
+        jal strncat
+        la $a0, test_str13      # "abcdstr"
+        la $a1, test_buf8       # (destination buffer)
         jal strcmp
         pop($ra)
         bne $v0, $zero, fail
