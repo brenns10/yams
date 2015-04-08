@@ -208,3 +208,63 @@ _strlen_loop:
         j _strlen_loop
 _strlen_return:
         jr $ra
+
+
+        # substr_index_of: Returns the first index of a substring in a string.
+        # Parameters:
+        #   $a0: Address of null-terminated string to search within.
+        #   $a1: Address of null-terminated substring to search for.
+        # Returns:
+        #   $v0: First index of $a1 in $a0, or -1 if not found.
+substr_index_of:
+        # Save values before strlen function call.
+        push($ra)
+        push($a0)
+        push($a1)
+        move $a0, $a1
+        # Get the length of the substring.
+        jal strlen
+        move $t0, $v0   # Store it in $t0
+        pop($a1)
+        pop($a0)        # $ra still on stack
+
+        # In this loop:
+        #  $t0: Length of substring.
+        #  $t1: Current address into $a0.
+        #  $t2: Address of substring.
+        move $t1, $a0
+        move $t2, $a1
+        push($a0)       # save $a0 so we can compute index later
+_ssio_loop:
+        # Check if we have reached the end of $a0.
+        lbu $t3, 0($t1)
+        beq $t3, $zero, _ssio_not_found
+
+        # Call strncmp on the substring and the current index into $a0.
+        move $a0, $t1   # Current addr into $a0
+        move $a1, $t2   # Addr of substring.
+        move $a2, $t0   # Number of characters to compare.
+        push($t0)
+        push($t1)
+        push($t2)
+        jal strncmp
+        pop($t2)
+        pop($t1)
+        pop($t0)
+
+        # If they are equal, we found it!
+        beq $v0, $zero, _ssio_found
+        # If not, increment index into $a0 and continue.
+        addi $t1, $t1, 1
+        j _ssio_loop
+
+_ssio_not_found:
+        pop($a0)        # Pop off $a0, which was still on stack.
+        pop($ra)        # Ditto with $ra
+        li $v0, -1      # Not found :(
+        jr $ra
+_ssio_found:
+        pop($a0)
+        pop($ra)
+        sub $v0, $t1, $a0       # Current address minus original address
+        jr $ra
