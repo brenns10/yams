@@ -21,6 +21,7 @@ test_str6:      .asciiz "ab"
 test_str7:      .asciiz "abcdtitive string with many t's."
 test_str8:      .asciiz "12345"
 test_str9:      .asciiz "DeAdBeEf"
+test_str10:     .asciiz "string"
 
 # These are allowed to be modified.
 test_buf:       .space 4
@@ -45,6 +46,8 @@ main:
         jal test_htoi
         jal test_strncmp
         jal test_strlen
+        jal test_ssio_found
+        jal test_ssio_not_found
         print(test_end)
         exit(0)
 
@@ -208,6 +211,28 @@ test_strlen:
         jal strlen
         pop($ra)
         li $t0, 8
+        bne $v0, $t0, fail
+        j pass
+
+############################### SUBSTR_INDEX_OF ################################
+
+test_ssio_found:
+        la $a0, test_str1
+        la $a1, test_str10
+        push($ra)
+        jal substr_index_of
+        pop($ra)
+        li $t0, 11
+        bne $v0, $t0, fail
+        j pass
+
+test_ssio_not_found:
+        la $a0, test_str1
+        la $a1, test_str9
+        push($ra)
+        jal substr_index_of
+        pop($ra)
+        li $t0, -1
         bne $v0, $t0, fail
         j pass
 
