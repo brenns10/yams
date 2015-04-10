@@ -32,3 +32,30 @@
 	addi	$sp, $sp, -4
 	lw	%dst_reg, 0($sp)
 .end_macro
+
+# pushes all callee-saved registers (i.e. $s0-s7, $ra)
+# useful for functions that use most of these registers (e.g. get_request)
+.macro push_all()
+	push($s0)
+	push($s1)
+	push($s2)
+	push($s3)
+	push($s4)
+	push($s5)
+	push($s6)
+	push($s7)
+	push($ra)
+.end_macro
+
+# un-does push_all by popping in reverse order
+.macro pop_all()
+	pop($ra)
+	pop($s7)
+	pop($s6)
+	pop($s5)
+	pop($s4)
+	pop($s3)
+	pop($s2)
+	pop($s1)
+	pop($s0)
+.end_macro
