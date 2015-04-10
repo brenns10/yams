@@ -25,10 +25,10 @@
 # Not sure what I'll need in here yet
 
 .text
-# a0 has HTTP method code (defined in http-requests.asm
+# a0 has HTTP method code (defined in http-requests.asm)
 # a1 has either the body (POST) or the URI (GET)
 build_response:
-  # push some temps
+  # TODO: push some temps
   beq $a0, HTTP_ERROR, _return_bad_request
   beq $a0, HTTP_OTHER, _return_method_name_not_allowed
   beq $a0, HTTP_POST, _handle_post
