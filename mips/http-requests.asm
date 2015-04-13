@@ -36,6 +36,8 @@ _gr_respond_to_expect_unsupported:	.asciiz	"_respond_to_expect not yet supported
 _gr_read_to_length_unsupported:		.asciiz	"_read_to_length not yet supported\n"
 _gr_read_all_chunks_unsupported:	.asciiz	"_read_all_chunks not yet supported\n"
 _gr_unsupported_expect_header:		.asciiz	"unsupported Expect header: "
+_gr_read_to_length_msg:			.asciiz	"in read_to_length: "
+_gr_Expect_header_msg:			.asciiz	"Expect header: "
 
 # Comparison strings
 chr_space:	.asciiz	" "
@@ -230,6 +232,7 @@ _get_content_len:
 	jal atoi
 	move content_len, $v0
 	print_int(content_len)
+	print(ln)
 
 	# swap back null byte
 	pop($t0)
@@ -258,12 +261,14 @@ _respond_to_expect:
 	# swap w/ null byte
 	lbu $t2, ($t1)
 	li $t0, 0
-	sw $t0, ($t1)
+	sb $t0, ($t1)
 	push($t2)
 	push($t1)
 
 	# debug prints
+	print(_gr_Expect_header_msg)
 	print_reg(temp_ptr)
+	print(ln)
 
 	move $a0, temp_ptr
 	la $a1, str_100continue
@@ -279,7 +284,7 @@ _respond_to_expect_return:
 	# swap back null byte, then return
 	pop($t0)
 	pop($t2)
-	sw $t2, ($t0)
+	sb $t2, ($t0)
 	pop($ra)
 	jr $ra
 
@@ -290,19 +295,20 @@ _write_100continue:
 	move $a2, $v0
 	la $a1, str_100continue_response
 	sock_write(sock_fd)
-	print(str_100continue_response)
-	print(ln)
 	j _respond_to_expect_return
 	
 _read_to_length:
-	print_int(cur_req_buff_ptr)
-	print(ln)
+	print(_gr_read_to_length_msg)
 	print_int(content_len)
 	print(ln)
 	move $a1, cur_req_buff_ptr
 	move $a2, content_len
 	sock_read(sock_fd)
 	add cur_req_buff_ptr, cur_req_buff_ptr, $v1
+	move $t1, $v1
+	print_int($t1)
+	print(ln)
+	print(ln)
 	j _match_request_type
 
 _read_all_chunks:
