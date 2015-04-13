@@ -92,7 +92,7 @@ _gr_read:
 
 	# now we get pointers to the body...
 	la $t0, req_buff
-	add body_ptr, $v0, $t0	# up to doubleCRLF
+	add body_ptr, $t0, $v0	# up to doubleCRLF
 	la $a0, double_CRLF
 	jal strlen
 	add body_ptr, body_ptr, $v0	# add doubleCRLF
@@ -273,8 +273,19 @@ _respond_to_expect:
 	move $a0, temp_ptr
 	la $a1, str_100continue
 	jal strcmp
-	beqz $v0, _write_100continue
+	bnez $v0, _respond_to_expect_error
 
+_write_100continue:
+	la $a0, str_100continue_response
+	jal strlen
+	move $a2, $v0
+	la $a1, str_100continue_response
+	sock_write(sock_fd)
+	print_int($v1)
+	print(ln)
+	j _respond_to_expect_return
+
+_respond_to_expect_error:
 	# TODO: check the spec and see what to do in the no-match case
 	# for now, we'll print, but return
 	print(_gr_unsupported_expect_header)
@@ -287,29 +298,26 @@ _respond_to_expect_return:
 	sb $t2, ($t0)
 	pop($ra)
 	jr $ra
-
-_write_100continue:
-	# if so, write out the response
-	la $a0, str_100continue_response
-	jal strlen
-	move $a2, $v0
-	la $a1, str_100continue_response
-	sock_write(sock_fd)
-	j _respond_to_expect_return
 	
 _read_to_length:
 	print(_gr_read_to_length_msg)
 	print_int(content_len)
 	print(ln)
+_read_to_length_loop:
+	sub $t0, cur_req_buff_ptr, body_ptr
+	sub $t0, content_len, $t0
+	print_int($t0)
+	print(ln)
 	move $a1, cur_req_buff_ptr
-	move $a2, content_len
+	move $a2, $t0
+	blez $a2, _match_request_type
 	sock_read(sock_fd)
 	add cur_req_buff_ptr, cur_req_buff_ptr, $v1
+
 	move $t1, $v1
-	print_int($t1)
-	print(ln)
-	print(ln)
-	j _match_request_type
+	#print_int($t1)
+	#print(ln)
+	j _read_to_length_loop
 
 _read_all_chunks:
 	print(_gr_read_all_chunks_unsupported)
@@ -318,7 +326,9 @@ _get_request_error:
 	li $v0, HTTP_ERROR
 	la $v1, str_empty
 _get_request_return:
+	move $t0, body_ptr
 	pop_all()
+	push($t0)
 	jr $ra
 
 
