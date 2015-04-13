@@ -199,7 +199,7 @@ _match_request_type:
 	jal strcmp
 	move $t0, $v0
 	li $v0, HTTP_POST
-	la $v1, req_buff
+	la $v1, req_uri_buff
 	beqz  $t0, _get_request_return
 
 	# Otherwise, we throw an error
