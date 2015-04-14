@@ -10,10 +10,11 @@
 .eqv	HTTP_ERROR	3
 .eqv	NO_SPACE	4
 
-.eqv	REQ_METHOD_BUFF_MAX	9
-.eqv	REQ_URI_BUFF_MAX	513
-.eqv	REQ_BUFF_MAX		1048576	# This is the largest amount of data we can reasonably hold
-.eqv	READ_SIZE		4096
+.eqv	REQ_METHOD_BUFF_MAX		9
+.eqv	REQ_URI_BUFF_MAX		513
+.eqv	REQ_CONTENT_TYPE_BUFF_MAX	129
+.eqv	REQ_BUFF_MAX			1048576	# This is the largest amount of data we can reasonably hold
+.eqv	READ_SIZE			4096
 
 .eqv	CHUNKED_TRANSFER_LEN	-2	# content_len is this if using chunked transfer
 
@@ -32,6 +33,7 @@ _gr_msg_length:	.asciiz	"Bytes read: "
 _gr_msg0: .asciiz	"Full Request:\n"
 _gr_msg1: .asciiz	"$s7 = <len of method> = "
 _gr_msg2: .asciiz	"$s6 = <len of URI> = "
+_gr_msg3: .asciiz	"$s6 = <len of Content-Type> = "
 _gr_respond_to_expect_unsupported:	.asciiz	"_respond_to_expect not yet supported\n"
 _gr_read_to_length_unsupported:		.asciiz	"_read_to_length not yet supported\n"
 _gr_read_all_chunks_unsupported:	.asciiz	"_read_all_chunks not yet supported\n"
@@ -53,15 +55,19 @@ str_empty:	.asciiz	""
 str_GET:	.asciiz	"GET"
 str_POST:	.asciiz	"POST"
 str_header_Expect:		.asciiz	"Expect:"
+str_header_ContentType:		.asciiz	"Content-Type:"
 str_header_ContentLength:	.asciiz	"Content-Length:"
 str_header_TransferEncoding:	.asciiz	"Transer-Encoding:"
 str_100continue:		.asciiz	"100-continue"
 str_100continue_response:	.asciiz	"HTTP/1.1 100 CONTINUE\r\n\r\n"
 
 # Buffers for request information
-req_buff: 		.byte	0:REQ_BUFF_MAX
+
 req_method_buff:	.byte	0:REQ_METHOD_BUFF_MAX
 req_uri_buff:		.byte	0:REQ_URI_BUFF_MAX
+req_content_type_buff:	.byte	0:REQ_CONTENT_TYPE_BUFF_MAX
+req_buff: 		.byte	0:REQ_BUFF_MAX
+
 
 .text
 get_request:
@@ -154,17 +160,49 @@ _parse_status_line:
 	print_int(req_uri_len)
 	print(ln)
 
+	###
+	# Header parsing begins here
+	###
+
 	# swap out doubleCRLF at end of header for null terminator
 	la $a0, double_CRLF
 	jal strlen
 	sub $t0, body_ptr, $v0
-	lbu $t1, (temp_ptr)
+	lbu $t1, ($t0)
 	li $t2, 0
-	sb $t2, (temp_ptr)
+	sb $t2, ($t0)
 	push($t0)
 	push($t1)
 
-_find_content_len:
+	# get the content-type
+	move $a0, header_ptr
+	la $a1, str_header_ContentType
+	jal substr_index_of
+	bltz $v0, _parse_content_len_headers
+
+	# temp_ptr -> end of :
+	add temp_ptr, header_ptr, $v0
+	la $a0, str_header_ContentType
+	jal strlen
+	add $a0, temp_ptr, $v0
+	jal _read_to_end_of_linear_whitespace
+
+	# find length of header value
+	move temp_ptr, $v0
+	move $a0, temp_ptr
+	la $a1, CRLF
+	jal substr_index_of
+
+	# copy the request content type
+	la $a0, req_content_type_buff
+	move $a1, temp_ptr
+	addi $a2, $v0, 1
+	li $t0, REQ_CONTENT_TYPE_BUFF_MAX
+	sgt $t1, $a2, $t0
+	movn $a2, $t0, $t1
+	jal strncpy
+
+_parse_content_len_headers:
 	li content_len, 0	# default value is no content
 
 	# check for content-length
@@ -343,7 +381,11 @@ _get_request_error:
 	la $v1, str_empty
 _get_request_return:
 	move $t0, body_ptr
+	move $t1, content_len
+	la $t2, req_content_type_buff
 	pop_all()
+	push($t2)
+	push($t1)
 	push($t0)
 	jr $ra
 
