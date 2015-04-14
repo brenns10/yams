@@ -21,7 +21,7 @@ msg4:	.asciiz		"Request Body Length = "
 msg5:	.asciiz		"Request Content-Type: "
 hwhtml:	.ascii		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 72\r\nConnection: close\r\n\r\n<html><h1>Hello, world!</h1><br/><h4>Served by MIPS and MARS.</h4></html>"
 hwhtml_end:
-formhtml:.ascii	"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 300\r\nConnection: close\r\n\r\n<html><h1>Hi</h1><form method='POST' action='/form.bfk' enctype='multipart/form-data'><label for='name'>Your name:</label><input name='name' type='text' id='name' /><br><input type='file' name='fle' id='input'><br><button type='submit'>Click Meh</button></form><h4>Served by MIPS and MARS.</h4></html>"
+formhtml:.ascii	"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 301\r\nConnection: close\r\n\r\n<html><h1>Hi</h1><form method='POST' action='/form.bfk' enctype='multipart/form-data'><label for='name'>Your name:</label><input name='name' type='text' id='name' /><br><input type='file' name='fle' id='input'><br><button type='submit'>Click Meh</button></form><h4>Served by MIPS and MARS.</h4></html>"
 formhtml_end:
 okay:	.ascii	"HTTP/1.1 200 OK\r\n\r\n"
 okay_end:
