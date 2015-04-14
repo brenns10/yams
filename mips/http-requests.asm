@@ -153,12 +153,12 @@ _parse_status_line:
 	jal strncpy
 
 	# print out length of request method, request uri for debugging
-	print(_gr_msg1)
-	print_int(req_method_len)
-	print(ln)
-	print(_gr_msg2)
-	print_int(req_uri_len)
-	print(ln)
+	#print(_gr_msg1)
+	#print_int(req_method_len)
+	#print(ln)
+	#print(_gr_msg2)
+	#print_int(req_uri_len)
+	#print(ln)
 
 	###
 	# Header parsing begins here
@@ -285,8 +285,6 @@ _get_content_len:
 	move $a0, temp_ptr
 	jal atoi
 	move content_len, $v0
-	print_int(content_len)
-	print(ln)
 
 	# swap back null byte
 	pop($t0)
@@ -319,11 +317,6 @@ _respond_to_expect:
 	push($t2)
 	push($t1)
 
-	# debug prints
-	print(_gr_Expect_header_msg)
-	print_reg(temp_ptr)
-	print(ln)
-
 	move $a0, temp_ptr
 	la $a1, str_100continue
 	jal strcmp
@@ -335,8 +328,6 @@ _write_100continue:
 	move $a2, $v0
 	la $a1, str_100continue_response
 	sock_write(sock_fd)
-	print_int($v1)
-	print(ln)
 	j _respond_to_expect_return
 
 _respond_to_expect_error:
@@ -354,23 +345,14 @@ _respond_to_expect_return:
 	jr $ra
 	
 _read_to_length:
-	print(_gr_read_to_length_msg)
-	print_int(content_len)
-	print(ln)
 _read_to_length_loop:
 	sub $t0, cur_req_buff_ptr, body_ptr
 	sub $t0, content_len, $t0
-	print_int($t0)
-	print(ln)
 	move $a1, cur_req_buff_ptr
 	move $a2, $t0
 	blez $a2, _match_request_type
 	sock_read(sock_fd)
 	add cur_req_buff_ptr, cur_req_buff_ptr, $v1
-
-	move $t1, $v1
-	#print_int($t1)
-	#print(ln)
 	j _read_to_length_loop
 
 _read_all_chunks:
