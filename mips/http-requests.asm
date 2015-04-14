@@ -93,6 +93,7 @@ _gr_read:
 	# now we get pointers to the body...
 	la $t0, req_buff
 	add body_ptr, $t0, $v0	# up to doubleCRLF
+	move temp_ptr, body_ptr
 	la $a0, double_CRLF
 	jal strlen
 	add body_ptr, body_ptr, $v0	# add doubleCRLF
@@ -153,6 +154,16 @@ _parse_status_line:
 	print_int(req_uri_len)
 	print(ln)
 
+	# swap out doubleCRLF at end of header for null terminator
+	la $a0, double_CRLF
+	jal strlen
+	sub $t0, body_ptr, $v0
+	lbu $t1, (temp_ptr)
+	li $t2, 0
+	sb $t2, (temp_ptr)
+	push($t0)
+	push($t1)
+
 _find_content_len:
 	li content_len, 0	# default value is no content
 
@@ -177,6 +188,11 @@ _check_expect:
 	la $a1, str_header_Expect
 	jal substr_index_of
 	bgezal $v0, _respond_to_expect	# ...respond if it exists, and handle its request
+
+	# Remove the null-byte at headers' end
+	pop($t1)
+	pop($t0)
+	sb $t1, ($t0)
 
 	# Read to length if there's content
 	bgtz content_len, _read_to_length
