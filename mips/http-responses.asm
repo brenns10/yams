@@ -4,7 +4,9 @@
 # Craft HTTP responses based on the request
 ###
 
+.include "file-io-macros.asm"
 .include "http-requests.asm"
+
 
 # response codes we will most likely be using
 .eqv HTTP_OK 200
@@ -22,13 +24,30 @@
 .eqv HTTP_INSUFFICIENT_STORAGE 507
 
 .data
-# Not sure what I'll need in here yet
+http_protocol: .asciiz "HTTP/1.1 "
+
+http_ok: .asciiz "200 OK\r\n"
+
+http_moved_permanently: .asciiz "301 MOVED PERMANENTLY\r\n"
+http_found: .asciiz "302 FOUND\r\n"
+http_not_modified: .asciiz "304 NOT MODIFIED\r\n"
+
+http_bad_request: .asciiz "400 BAD REQUEST\r\n"
+http_forbidden: .asciiz "403 FORBIDDEN\r\n"
+http_not_found: .asciiz "404 NOT FOUND\r\n"
+http_method_name_not_allowed: .asciiz "405 METHOD NAME NOT ALLOWED\r\n"
+
+http_internal_server_error: .asciiz "500 INTERNAL SERVER ERROR\r\n"
+http_insufficient_storage: .asciiz "507 INSUFFICIENT STORAGE\r\n"
+
+resp_buff: .byte 0:REQ_BUFF_MAX
+resp_buff_temp: .byte 0:REQ_BUFF_MAX
 
 .text
 # a0 has HTTP method code (defined in http-requests.asm)
 # a1 has either the body (POST) or the URI (GET)
 build_response:
-  # TODO: push some temps
+  push($a0)
   beq $a0, HTTP_ERROR, _return_bad_request
   beq $a0, HTTP_OTHER, _return_method_name_not_allowed
   beq $a0, HTTP_POST, _handle_post
@@ -36,4 +55,19 @@ build_response:
 _handle_get:
 _handle_post:
 _return_method_name_not_allowed:
+  move $a0, http_protocol
+  move $a1, http_method_name_not_allowed
+  move $a2, resp_buff
+  jal strcat
+  j _return_resp
+
 _return_bad_request:
+  move $a0, http_protocol
+  move $a1, http_bad_request
+  move $a2, resp_buff
+  jal strcat
+
+_return_resp:
+  move $v0, resp_buff
+  pop($a0)
+  jr $ra
