@@ -42,5 +42,10 @@ test_return_method_name_not_allowed:
   bne $v0, $zero, fail
   j pass
 
+.eqv HTTP_GET 0
+.eqv HTTP_POST 1
+.eqv HTTP_OTHER 2
+.eqv HTTP_ERROR 3
+
 .include "http-responses.asm"
 .include "string.asm"
