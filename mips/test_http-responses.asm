@@ -19,6 +19,7 @@ _method_name_not_allowed_resp: .asciiz "HTTP/1.1 405 METHOD NAME NOT ALLOWED\r\n
 
 main:
         print(test_start)
+        jal test_return_method_name_not_allowed
         print(test_end)
         exit(0)
 
