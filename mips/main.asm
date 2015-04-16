@@ -12,6 +12,7 @@
 
 .eqv	MAX_REQUESTS	5
 .eqv	num_requests	$s7
+.eqv	request_type	$s2
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
@@ -26,6 +27,7 @@ formhtml_end:
 okay:	.ascii	"HTTP/1.1 200 OK\r\n\r\n"
 okay_end:
 ln:	.asciiz		"\n"
+
 .text
 .globl	main
 main:
@@ -34,7 +36,7 @@ main:
 	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
 req_loop:
 	ssock_accept($s0, $s1)	# accept connection from server_socket in $s0, store client FD in $s1
-	
+
 	# read & parse a single request
 	move $a0, $s1	# requires the server socket FD in $a0
 	jal get_request
@@ -71,13 +73,45 @@ req_loop:
 	print_reg($s4)
 	print(ln)
 
-	# dispatch the appropriate handler -- below is only one for now
+	j dispatch_default  # for now, always dispatch to the default
+	#li $t0, HTTP_GET
+	#beq request_type, $t0, dispatch_get
+	#li $t0, HTTP_POST
+	#beq request_type, $t0, dispatch_post
+	#li $t0, HTTP_OTHER
+	#beq request_type, $t0, dispatch_other
+	# errors will go here (e.g. insufficient space, malformed request)
+	# default case will be 405 (bad request)
+
+dispatch_get:
+	# Convert URI -> filepath
+	# Open file@filepath
+	# confirm file exists
+	# if so, build a 200 w/ the data
+	# else, 404
+	j close_client_socket
+
+dispatch_post:
+	# If <some condition met>:
+	# - decode POST request
+	# - call into whitespace interpreter
+	# else, 404/400 (bad request)
+	j close_client_socket
+
+dispatch_other:
+	# return 405 (method name not allowed)
+	j close_client_socket
+
+dispatch_default:
+	# default handler
 	la $a1, formhtml
-	# compute length of hwhtml
+	# compute length of formhtml
 	la $a2, formhtml_end
 	sub $a2, $a2, $a1
 	sock_write($s1)
-	
+	j close_client_socket
+
+close_client_socket:
 	# we don't bother re-using connections, so we can close.
 	sock_close($s1)
 	addi num_requests, num_requests, -1
