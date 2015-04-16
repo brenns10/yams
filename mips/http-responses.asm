@@ -4,10 +4,6 @@
 # Craft HTTP responses based on the request
 ###
 
-.include "file-io-macros.asm"
-.include "http-requests.asm"
-
-
 # response codes we will most likely be using
 .eqv HTTP_OK 200
 
@@ -47,7 +43,6 @@ resp_buff_temp: .byte 0:REQ_BUFF_MAX
 # a0 has HTTP method code (defined in http-requests.asm)
 # a1 has either the body (POST) or the URI (GET)
 build_response:
-  push($a0)
   beq $a0, HTTP_ERROR, _return_bad_request
   beq $a0, HTTP_OTHER, _return_method_name_not_allowed
   beq $a0, HTTP_POST, _handle_post
@@ -58,16 +53,19 @@ _return_method_name_not_allowed:
   move $a0, http_protocol
   move $a1, http_method_name_not_allowed
   move $a2, resp_buff
+  push($ra)
   jal strcat
+  pop($ra)
   j _return_resp
 
 _return_bad_request:
   move $a0, http_protocol
   move $a1, http_bad_request
   move $a2, resp_buff
+  push($ra)
   jal strcat
+  pop($ra)
 
 _return_resp:
   move $v0, resp_buff
-  pop($a0)
   jr $ra
