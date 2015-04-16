@@ -52,22 +52,22 @@ build_response:
 _handle_get:
 _handle_post:
 _return_method_name_not_allowed:
-  move $a0, http_protocol
-  move $a1, http_method_name_not_allowed
-  move $a2, resp_buff
+  la $a0, http_protocol
+  la $a1, http_method_name_not_allowed
+  la $a2, resp_buff
   push($ra)
   jal strcat
   pop($ra)
   j _return_resp
 
 _return_bad_request:
-  move $a0, http_protocol
-  move $a1, http_bad_request
-  move $a2, resp_buff
+  la $a0, http_protocol
+  la $a1, http_bad_request
+  la $a2, resp_buff
   push($ra)
   jal strcat
   pop($ra)
 
 _return_resp:
-  move $v0, resp_buff
+  la $v0, resp_buff
   jr $ra
