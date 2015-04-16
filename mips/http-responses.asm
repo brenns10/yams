@@ -19,6 +19,8 @@
 .eqv HTTP_INTERNAL_SERVER_ERROR 500
 .eqv HTTP_INSUFFICIENT_STORAGE 507
 
+.eqv RESP_BUFF_SIZE 2048
+
 .data
 http_protocol: .asciiz "HTTP/1.1 "
 
@@ -36,8 +38,8 @@ http_method_name_not_allowed: .asciiz "405 METHOD NAME NOT ALLOWED\r\n"
 http_internal_server_error: .asciiz "500 INTERNAL SERVER ERROR\r\n"
 http_insufficient_storage: .asciiz "507 INSUFFICIENT STORAGE\r\n"
 
-resp_buff: .byte 0:REQ_BUFF_MAX
-resp_buff_temp: .byte 0:REQ_BUFF_MAX
+resp_buff: .byte 0:RESP_BUFF_SIZE
+resp_buff_temp: .byte 0:RESP_BUFF_SIZE
 
 .text
 # a0 has HTTP method code (defined in http-requests.asm)
