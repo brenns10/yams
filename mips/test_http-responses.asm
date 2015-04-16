@@ -13,6 +13,7 @@ test_start:     .asciiz "STARTING TESTS.\n"
 test_end:       .asciiz "FINISHED TESTS.\n"
 
 _method_name_not_allowed_resp: .asciiz "HTTP/1.1 405 METHOD NAME NOT ALLOWED\r\n\r\n"
+_bad_request_resp: .asciiz "HTTP/1.1 400 BAD REQUEST\r\n\r\n"
 
 .text
 .globl main
@@ -20,6 +21,7 @@ _method_name_not_allowed_resp: .asciiz "HTTP/1.1 405 METHOD NAME NOT ALLOWED\r\n
 main:
         print(test_start)
         jal test_return_method_name_not_allowed
+        jal test_return_bad_request
         print(test_end)
         exit(0)
 
@@ -38,6 +40,16 @@ test_return_method_name_not_allowed:
   jal _return_method_name_not_allowed
   move $a0, $v0
   la $a1, _method_name_not_allowed_resp
+  jal strncmp
+  pop($ra)
+  bne $v0, $zero, fail
+  j pass
+
+test_return_bad_request:
+  push($ra)
+  jal _return_bad_request
+  move $a0, $v0
+  la $a1, _bad_request_resp
   jal strncmp
   pop($ra)
   bne $v0, $zero, fail
