@@ -92,6 +92,7 @@ dispatch_get:
 	j close_client_socket
 
 dispatch_post:
+	# Simplifying Assumption -- use `curl` to trigger interpretation
 	# If <some condition met>:
 	# - decode POST request
 	# - call into whitespace interpreter
