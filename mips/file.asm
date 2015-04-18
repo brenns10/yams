@@ -4,9 +4,9 @@
 # Code for file URI to file handle conversion
 ###
 
-# macro includes
-.include "file-io-macros.asm"
-.include "util-macros.asm"
+# macro requirements
+# "file-io-macros.asm"
+# "util-macros.asm"
 
 .data
 
