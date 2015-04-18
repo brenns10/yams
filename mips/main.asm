@@ -85,11 +85,23 @@ req_loop:
 
 dispatch_get:
 	# Convert URI -> filepath
+  move $a0, $s5
+  jal uri_file_handle_fetch
 	# Open file@filepath
 	# confirm file exists
+  bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
 	# else, 404
 	j close_client_socket
+
+dispatch_404:
+  jal return_404
+  move $a0, $v0
+  jal strlen # How long is the response?
+  move $a2, $v0
+  sock_write($s1)
+  j close_client_socket
+  
 
 dispatch_post:
 	# Simplifying Assumption -- use `curl` to trigger interpretation
@@ -122,6 +134,7 @@ close_client_socket:
 	exit(0)
 
 # module includes
+.include "file.asm"
 .include "http-requests.asm"
 .include "string.asm"
 
