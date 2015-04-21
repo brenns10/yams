@@ -36,7 +36,7 @@ uri_file_handle_fetch:
 	
 	# Push base path onto path
 	la $a0, _file_path_buff
-	la $a1, default_dir
+	la $a1, _file_default_dir
 	la $a2, _FILE_PATH_MAX_LEN
 	
 	jal strncpy

@@ -5,5 +5,5 @@
 ###
 
 # Config fields for file-config.asm
-_file__file_default_dir:	.asciiz "html"
+_file_default_dir:	.asciiz "html"
 _file_default_resource:	.asciiz "index.html"
