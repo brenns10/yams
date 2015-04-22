@@ -59,6 +59,21 @@ return_404:
 
   j _return_resp
 
+return_200:
+  push($ra)
+
+  la $a0, http_protocol
+  la $a1, http_ok
+  la $a2, resp_buff
+  jal strcat
+
+  la $a0, resp_buff
+  la $a1, standard_headers
+  la $a2, resp_buff
+  jal strcat
+
+  j _return_resp
+
 return_method_name_not_allowed:
   push($ra)
 

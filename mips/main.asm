@@ -88,11 +88,24 @@ dispatch_get:
   move $a0, $s5
   jal uri_file_handle_fetch
 	# Open file@filepath
-	# confirm file exists
+	# confirm file exists, if not 404
   bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
-	# else, 404
-	j close_client_socket
+  move $t0, $v0 # save the file handle for later
+  jal return_200
+  move $a0, $v0
+  jal strlen
+  move $a2, $v0
+  sock_write($s1)
+
+  li $t0, 1
+stream_file:
+  blez $t0, close_client_socket
+  file_read($v0, resp_buff, CHUNK_SIZE, $t0)
+  move $a0, resp_buff
+  move $a1, $t0
+  sock_write($s1)
+  j stream_file
 
 dispatch_404:
   jal return_404
