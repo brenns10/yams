@@ -21,7 +21,7 @@
 .eqv	MAX_REQUESTS	5
 .eqv	num_requests	$s7
 .eqv	request_type	$s2
-.eqv  CHUNK_SIZE    4096
+.eqv	CHUNK_SIZE	1024
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
@@ -36,8 +36,12 @@ formhtml_end:
 okay:	.ascii	"HTTP/1.1 200 OK\r\n\r\n"
 okay_end:
 ln:	.asciiz		"\n"
-
-filestream_buff: .byte 0:CHUNK_SIZE
+rf_file:	.asciiz		"reading from file\n"
+rf_file_done:	.asciiz		"done reading from file\n"
+wt_sock:	.asciiz		"writing to socket\n"
+wt_sock_done:	.asciiz		"done writing to socket\n"
+cl_file:	.asciiz		"closing file\n"
+filestream_buff:	.space	CHUNK_SIZE
 
 .text
 .globl	main
@@ -84,6 +88,7 @@ req_loop:
 	#print_reg($s4)
 	#print(ln)
 
+	#j dispatch_default
 	li $t0, HTTP_GET
 	beq request_type, $t0, dispatch_get
 	li $t0, HTTP_POST
@@ -96,34 +101,50 @@ req_loop:
 
 dispatch_get:
 	# Convert URI -> filepath
-	move $a0, $s5
+	move $a0, $s3
 	jal uri_file_handle_fetch
 	# Open file@filepath
 	# confirm file exists, if not 404
+	move $t7, $v0
+	print_int($t7)
+	move $v0, $t7
 	bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
-	move $t0, $v0 # save the file handle for later
+	move $s7, $v0 # save the file handle for later
 	jal return_200
+	move $s6, $v0
 	move $a0, $v0
 	jal strlen
+	move $a1, $s6
 	move $a2, $v0
 	sock_write($s1)
 
-	move $v0, $t0 # put the file handle back in v0
-	li $t0, 1
 stream_file:
-	blez $t0, close_client_socket
+	print(rf_file)
 	li $t1, CHUNK_SIZE
-	file_read($v0, filestream_buff, $t1, $t0)
-	la $a0, filestream_buff
-	move $a1, $t0
+	file_read($s7, filestream_buff, $t1, $s6)
+	print_int($s6)
+	print(ln)
+	print(rf_file_done)
+	print(filestream_buff)
+	print(wt_sock)
+	la $a1, filestream_buff
+	move $a2, $s6
 	sock_write($s1)
-	j stream_file
+	print(wt_sock_done)
+	bgtz $s6, stream_file
+
+stream_file_cleanup:
+	print(cl_file)
+	file_close($s7)
+	j close_client_socket
 
 dispatch_404:
 	jal return_404
+	move $s6, $v0
 	move $a0, $v0
 	jal strlen # How long is the response?
+	move $a1, $s6
 	move $a2, $v0
 	sock_write($s1)
 	j close_client_socket

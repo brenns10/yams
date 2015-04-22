@@ -38,7 +38,7 @@ http_method_name_not_allowed: .asciiz "405 METHOD NAME NOT ALLOWED\r\n"
 http_internal_server_error: .asciiz "500 INTERNAL SERVER ERROR\r\n"
 http_insufficient_storage: .asciiz "507 INSUFFICIENT STORAGE\r\n"
 
-standard_headers: .asciiz "Connection: Close\r\nServer:yams\r\n"
+standard_headers: .asciiz "Connection: Close\r\nServer: yams\r\n\r\n"
 
 resp_buff: .byte 0:RESP_BUFF_SIZE
 
@@ -51,12 +51,14 @@ return_404:
   la $a2, resp_buff
   jal strcat
   print(resp_buff)
+  print(ln)
 
   la $a0, resp_buff
   la $a1, standard_headers
   la $a2, resp_buff # redundant, but here for clarity
   jal strcat
   print(resp_buff)
+  print(ln)
 
   j _return_resp
 
