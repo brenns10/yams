@@ -77,13 +77,13 @@ req_loop:
 	print_reg($s4)
 	print(ln)
 
+	li $t0, HTTP_GET
+	beq request_type, $t0, dispatch_get
+	li $t0, HTTP_POST
+	beq request_type, $t0, dispatch_post
+	li $t0, HTTP_OTHER
+	beq request_type, $t0, dispatch_other
 	j dispatch_default  # for now, always dispatch to the default
-	#li $t0, HTTP_GET
-	#beq request_type, $t0, dispatch_get
-	#li $t0, HTTP_POST
-	#beq request_type, $t0, dispatch_post
-	#li $t0, HTTP_OTHER
-	#beq request_type, $t0, dispatch_other
 	# errors will go here (e.g. insufficient space, malformed request)
 	# default case will be 405 (bad request)
 
