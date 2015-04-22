@@ -89,37 +89,37 @@ req_loop:
 
 dispatch_get:
 	# Convert URI -> filepath
-  move $a0, $s5
-  jal uri_file_handle_fetch
+	move $a0, $s5
+	jal uri_file_handle_fetch
 	# Open file@filepath
 	# confirm file exists, if not 404
-  bltz $v0, dispatch_404
+	bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
-  move $t0, $v0 # save the file handle for later
-  jal return_200
-  move $a0, $v0
-  jal strlen
-  move $a2, $v0
-  sock_write($s1)
+	move $t0, $v0 # save the file handle for later
+	jal return_200
+	move $a0, $v0
+	jal strlen
+	move $a2, $v0
+	sock_write($s1)
 
-  move $v0, $t0 # put the file handle back in v0
-  li $t0, 1
+	move $v0, $t0 # put the file handle back in v0
+	li $t0, 1
 stream_file:
-  blez $t0, close_client_socket
-  li $t1, CHUNK_SIZE
-  file_read($v0, filestream_buff, $t1, $t0)
-  la $a0, filestream_buff
-  move $a1, $t0
-  sock_write($s1)
-  j stream_file
+	blez $t0, close_client_socket
+	li $t1, CHUNK_SIZE
+	file_read($v0, filestream_buff, $t1, $t0)
+	la $a0, filestream_buff
+	move $a1, $t0
+	sock_write($s1)
+	j stream_file
 
 dispatch_404:
-  jal return_404
-  move $a0, $v0
-  jal strlen # How long is the response?
-  move $a2, $v0
-  sock_write($s1)
-  j close_client_socket
+	jal return_404
+	move $a0, $v0
+	jal strlen # How long is the response?
+	move $a2, $v0
+	sock_write($s1)
+	j close_client_socket
   
 
 dispatch_post:
@@ -132,11 +132,11 @@ dispatch_post:
 
 dispatch_other:
 	# return 405 (method name not allowed)
-  jal return_method_name_not_allowed
-  move $a0, $v0
-  jal strlen
-  move $a2, $v0
-  sock_write($s1)
+	jal return_method_name_not_allowed
+	move $a0, $v0
+	jal strlen
+	move $a2, $v0
+	sock_write($s1)
 	j close_client_socket
 
 dispatch_default:
