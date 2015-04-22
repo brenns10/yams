@@ -17,7 +17,7 @@ test_uri1:	.asciiz "/"
 test_uri2:	.asciiz "/minimal_page.html"
 test_uri3:	.asciiz "/invalid/invalid.txt"
 
-.include "config.asm"
+.include "config_file_testing.asm"
 
 .text
 .globl main
