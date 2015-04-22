@@ -113,6 +113,11 @@ dispatch_post:
 
 dispatch_other:
 	# return 405 (method name not allowed)
+  jal return_method_name_not_allowed
+  move $a0, $v0
+  jal strlen
+  move $a2, $v0
+  sock_write($s1)
 	j close_client_socket
 
 dispatch_default:
