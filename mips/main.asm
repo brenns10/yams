@@ -98,6 +98,7 @@ dispatch_get:
   move $a2, $v0
   sock_write($s1)
 
+  move $v0, $t0 # put the file handle back in v0
   li $t0, 1
 stream_file:
   blez $t0, close_client_socket
