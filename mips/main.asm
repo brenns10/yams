@@ -106,8 +106,9 @@ dispatch_get:
   li $t0, 1
 stream_file:
   blez $t0, close_client_socket
-  file_read($v0, filestream_buff, CHUNK_SIZE, $t0)
-  move $a0, filestream_buff
+  li $t1, CHUNK_SIZE
+  file_read($v0, filestream_buff, $t1, $t0)
+  la $a0, filestream_buff
   move $a1, $t0
   sock_write($s1)
   j stream_file
