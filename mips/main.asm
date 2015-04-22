@@ -160,5 +160,6 @@ close_client_socket:
 # module includes
 .include "file.asm"
 .include "http-requests.asm"
+.include "http-responses.asm"
 .include "string.asm"
 
