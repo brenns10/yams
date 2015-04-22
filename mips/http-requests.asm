@@ -4,11 +4,6 @@
 # Code that reads in an HTTP request and extracts relevant information
 ###
 
-.eqv	HTTP_GET	0
-.eqv	HTTP_POST	1
-.eqv	HTTP_OTHER	2
-.eqv	HTTP_ERROR	3
-.eqv	NO_SPACE	4
 
 .eqv	REQ_METHOD_BUFF_MAX		9
 .eqv	REQ_URI_BUFF_MAX		513

@@ -11,6 +11,13 @@
 
 # module includes at bottom of file (otherwise entry point is messed up)
 
+# Because MARS includes are hilarious
+.eqv	HTTP_GET	0
+.eqv	HTTP_POST	1
+.eqv	HTTP_OTHER	2
+.eqv	HTTP_ERROR	3
+.eqv	NO_SPACE	4
+
 .eqv	MAX_REQUESTS	5
 .eqv	num_requests	$s7
 .eqv	request_type	$s2
@@ -73,9 +80,9 @@ req_loop:
 	print(ln)
 
 	# Request Body
-	print(msg3)
-	print_reg($s4)
-	print(ln)
+	#print(msg3)
+	#print_reg($s4)
+	#print(ln)
 
 	li $t0, HTTP_GET
 	beq request_type, $t0, dispatch_get
