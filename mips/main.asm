@@ -6,6 +6,7 @@
 
 # macro includes
 .include "util-macros.asm"
+.include "file-io-macros.asm"
 .include "socket-macros.asm"
 
 # module includes at bottom of file (otherwise entry point is messed up)
