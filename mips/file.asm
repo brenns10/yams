@@ -104,6 +104,3 @@ _uri_file_handle_fetch_return:
 	pop($s0)
 	pop($ra)
 	jr $ra
-
-# module includes
-.include "string.asm"
