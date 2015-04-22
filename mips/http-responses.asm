@@ -41,7 +41,6 @@ http_insufficient_storage: .asciiz "507 INSUFFICIENT STORAGE\r\n"
 standard_headers: .asciiz "Connection: Close\r\nServer:yams\r\n"
 
 resp_buff: .byte 0:RESP_BUFF_SIZE
-resp_buff_temp: .byte 0:RESP_BUFF_SIZE
 
 .text
 return_404:
@@ -51,11 +50,13 @@ return_404:
   la $a1, http_not_found
   la $a2, resp_buff
   jal strcat
+  print(resp_buff)
 
   la $a0, resp_buff
   la $a1, standard_headers
   la $a2, resp_buff # redundant, but here for clarity
   jal strcat
+  print(resp_buff)
 
   j _return_resp
 
