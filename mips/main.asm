@@ -13,6 +13,7 @@
 .eqv	MAX_REQUESTS	5
 .eqv	num_requests	$s7
 .eqv	request_type	$s2
+.eqv  CHUNK_SIZE    4096
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
@@ -27,6 +28,8 @@ formhtml_end:
 okay:	.ascii	"HTTP/1.1 200 OK\r\n\r\n"
 okay_end:
 ln:	.asciiz		"\n"
+
+filestream_buff: .byte 0:CHUNK_SIZE
 
 .text
 .globl	main
@@ -102,8 +105,8 @@ dispatch_get:
   li $t0, 1
 stream_file:
   blez $t0, close_client_socket
-  file_read($v0, resp_buff, CHUNK_SIZE, $t0)
-  move $a0, resp_buff
+  file_read($v0, filestream_buff, CHUNK_SIZE, $t0)
+  move $a0, filestream_buff
   move $a1, $t0
   sock_write($s1)
   j stream_file
