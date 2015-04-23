@@ -91,18 +91,8 @@ _bf_load_err_return:
         # Parameters:
         #   $a0: Address of input string (null terminated).
         # Returns:
-        #   $v0: 0 on success.  -1 on output memory error.  -2 on input error.
+        #   $v0: 0 on success.
 bf_intrp:
-        push($ra)
-        push($a0)
-
-        # Zero out the brainfuck buffer before executing.
-        la $a0, buffer
-        move $a1, $zero
-        li $a2, MEMORY
-        jal memset
-        pop($a0)
-
         # Load code start pointer into $t0.
         # Load address of last instruction in $t1.
         la $t1, code_size
@@ -116,18 +106,39 @@ bf_intrp:
 
         # Data pointer is $t3.
         la $t3, buffer
+        sb $zero, 0($t3)
 
         # Current instruction pointer is $t4 (actual instruction, $t5).
         la $t4, code
 
+        # Max data pointer, so we know when to zero memory.
+        addi $t9, $t3, 1
+
 _bf_intrp_loop:
         bgt $t4, $t1, _bf_intrp_end
         blt $t4, $t0, _bf_intrp_end
+        blt $t3, $t9, _bf_intrp_nozero
+        sb $zero, 0($t3)
+        move $t9, $t3
+        addi $t9, $t9, 1
+_bf_intrp_nozero:
         lbu $t5, 0($t4)
         li $t6, '+'
         beq $t5, $t6, _bf_intrp_inc
         li $t6, '-'
         beq $t5, $t6, _bf_intrp_dec
+        li $t6, '>'
+        beq $t5, $t6, _bf_intrp_nxt
+        li $t6, '<'
+        beq $t5, $t6, _bf_intrp_prv
+        li $t6, ','
+        beq $t5, $t6, _bf_intrp_read
+        li $t6, '.'
+        beq $t5, $t6, _bf_intrp_write
+        li $t6, '['
+        beq $t5, $t6, _bf_intrp_loopstart
+        li $t6, ']'
+        beq $t5, $t6, _bf_intrp_loopend
 
 _bf_intrp_inc: # + (increment value at data cell)
         lbu $t6, 0($t3)

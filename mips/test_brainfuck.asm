@@ -15,8 +15,10 @@ test_end:       .asciiz "FINISHED TESTS.\n"
 test_code1:      .asciiz "ab . a' <uskc>.[]) {w,+ -( })"
 test_code2:     .asciiz "..[]+ [<><>-,.[[-]]]]"
 test_code3:     .asciiz "[.+.+.,+-"
+test_code4:     .asciiz "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
 
 test_str1:      .asciiz ".<>.[],+-"
+test_str2:      .asciiz "Hello World!\n"
 
 .text
 .globl main
@@ -26,6 +28,7 @@ main:
 	jal test_bf_load_code
         jal test_bf_load_extra_close
         jal test_bf_load_extra_open
+        jal test_bf_intrp
         print(test_end)
         exit(0)
 
@@ -72,6 +75,22 @@ test_bf_load_extra_open:
         la $t0, code_size
         lw $t0, 0($t0)
         bne $t0, $zero, fail    # make sure code size is zero
+        j pass
+
+test_bf_intrp:
+        push($ra)
+        la $a0, test_code4
+        jal bf_load_code
+        jal bf_intrp
+        la $a0, out
+        li $v0, 34
+        syscall
+	print(out)
+        la $a0, test_str2
+        la $a1, out
+        jal strcmp
+        pop($ra)
+        bne $v0, $zero, fail
         j pass
 
 
