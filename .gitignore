@@ -8,4 +8,12 @@ bin
 # Don't scoop up Modded MARS
 mars-sockets/
 
+# LaTeX
+*.pdf
+*.aux
+*.log
+*.dvi
+*.png
+*.*~
+
 # Needs to be extended to cover all code and projects as applicable
