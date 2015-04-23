@@ -4,8 +4,8 @@
         # Code for brainfuck interpereter.
         ###
 
-.eqv    CODE_BUFFER     1024
-.eqv    OUT_BUFFER      1024
+.eqv    CODE_BUFFER     4096
+.eqv    OUT_BUFFER      4096
 .eqv    MEMORY          32768
 
 .data
