@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>MIPS Brainfuck Interpreter</title>
+    <script>
+    function post(url, data, success) {
+          console.log("Sending AJAX request.");
+          var xmlhttp;
+          if (window.XMLHttpRequest) {
+              // Non-IE6 browsers
+              xmlhttp = new XMLHttpRequest();
+          } else {
+              xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+          }
+
+          xmlhttp.onreadystatechange = function() {
+              if (xmlhttp.readyState == 4) {
+                  if (xmlhttp.status == 200) {
+                      console.log("AJAX response received.");
+                      success(xmlhttp);
+                  } else {
+                      console.log("AJAX request received server error.");
+                  }
+              }
+          };
+        xmlhttp.open("POST", url, true);
+        xmlhttp.setRequestHeader("Content-type", "text/plain");
+        xmlhttp.send(data);
+      }
+      function load() {
+          var code = document.getElementById("bf_code").value;
+          document.getElementById("load_output").innerHTML = "Loading code.";
+          var url = window.location.protocol + '//' + window.location.host + '/load';
+          post(url, code, function(r) {document.getElementById("load_output").innerHTML = r.responseText;});
+      }
+      function run() {
+          var input = document.getElementById("bf_in").value;
+          var url = window.location.protocol + '//' + window.location.host + '/run';
+          post(url, input, function(r) {document.getElementById("bf_out").value = r.responseText;});
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>MIPS Brainfuck Interpreter</h1>
+    <p>Enter code here:</p>
+    <textarea id="bf_code" rows="10" cols="50"></textarea><br>
+    <button type="button" onclick="load()">Load!</button>
+    <p id="load_output"></p>
+    <p>Enter input here:</p>
+    <textarea id="bf_in" rows="10" cols="50"></textarea><br>
+    <button type="button" onclick="run()">Run!</button>
+    <p>Receive output here:</p>
+    <textarea id="bf_out" rows="10" cols="50"></textarea>
+  </body>
+</html>

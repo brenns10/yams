@@ -39,6 +39,11 @@ rf_file_done:	.asciiz		"done reading from file\n"
 wt_sock:	.asciiz		"writing to socket\n"
 wt_sock_done:	.asciiz		"done writing to socket\n"
 cl_file:	.asciiz		"closing file\n"
+bf_load_uri:	.asciiz		"/load"
+bf_run_uri:	.asciiz		"/run"
+bf_lc_success:	.asciiz		"Code loaded."
+bf_lc_memory:	.asciiz		"Memory error."
+bf_lc_balance:	.asciiz		"Unbalanced brackets."
 filestream_buff:	.space	CHUNK_SIZE
 
 .text
@@ -153,7 +158,65 @@ dispatch_post:
 	# - decode POST request
 	# - call into whitespace interpreter
 	# else, 404/400 (bad request)
+	la $a0, bf_load_uri
+	move $a1, $s3
+	jal strcmp
+	beq $v0, $zero, _post_bf_load
+	la $a0, bf_run_uri
+	move $a1, $s3
+	jal strcmp
+	beq $v0, $zero, _post_bf_run
+	j dispatch_404
+
+_post_bf_load:
+	move $a0, $s4
+	jal bf_load_code
+	push($v0)
+	jal return_200
+	move $s6, $v0
+	move $a0, $v0
+	jal strlen # How long is the response?
+	move $a1, $s6
+	move $a2, $v0
+	sock_write($s1)
+	pop($v0)
+	beq $v0, $zero, _post_bf_load_success
+	li $t0, 1
+	beq $v0, $t0, _post_bf_load_mem
+	li $t0, 2
+	beq $v0, $t0, _post_bf_load_bal
+_post_bf_load_success:
+	la $a1, bf_lc_success
+	la $a2, 12
+	j _post_bf_load_continue
+_post_bf_load_mem:
+	la $a1, bf_lc_memory
+	la $a2, 13
+	j _post_bf_load_continue
+_post_bf_load_bal:
+	la $a1, bf_lc_balance
+	la $a2, 20
+_post_bf_load_continue:
+	sock_write($s1)
 	j close_client_socket
+
+_post_bf_run:
+	move $a0, $s4
+	jal bf_intrp
+	jal return_200
+	move $s6, $v0
+	move $a0, $v0
+	jal strlen # How long is the response?
+	move $a1, $s6
+	move $a2, $v0
+	sock_write($s1)
+	la $a0, bf_out
+	jal strlen
+	la $a1, bf_out
+	move $a2, $v0
+        sock_write($s1)
+        j close_client_socket
+
 
 dispatch_other:
 	# return 405 (method name not allowed)
@@ -186,4 +249,4 @@ close_client_socket:
 .include "http-requests.asm"
 .include "http-responses.asm"
 .include "string.asm"
-
+.include "brainfuck.asm"
