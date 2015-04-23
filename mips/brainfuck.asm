@@ -34,7 +34,7 @@ bf_load_code:
 _bf_load_loop:
         lb $t2, 0($a0)
         beq $t2, $zero, _bf_load_return
-        beq $t0, $zero, _bf_load_err_return
+        beq $t0, $zero, _bf_load_memerr_return
 	li $t3, '>'
         beq $t2, $t3, _bf_load_store
 	li $t3, '<'
@@ -59,16 +59,17 @@ _bf_increment_balance:
         j _bf_load_store
 _bf_decrement_balance:
         addi $t4, $t4, -1
-        blt $t4, $zero, _bf_balance_error
+        blt $t4, $zero, _bf_load_balerr_return
 _bf_load_store:
-        sb $t2, 0($t2)
+        sb $t2, 0($t1)
         addi $t1, $t1, 1
         addi $t0, $t0, -1
+        addi $a0, $a0, 1
         j _bf_load_loop
 
 _bf_load_return:
         # Return an error if the bracket balance is off.
-        bgt $t4, $zero, _bf_balance_error
+        bgt $t4, $zero, _bf_load_balerr_return
         move $v0, $zero
         li $t1, CODE_BUFFER
         sub $t1, $t1, $t0       # Calculate size of code
