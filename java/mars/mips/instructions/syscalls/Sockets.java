@@ -78,5 +78,23 @@ public final class Sockets {
             // Really, there's not much we can do.
         }
     }
-}
 
+    public static void closeAll() {
+        for (Socket s : sockets) {
+            try {
+                s.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for (ServerSocket s : serverSockets) {
+            try {
+                s.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        sockets = new ArrayList<>();
+        serverSockets = new ArrayList<>();
+    }
+}

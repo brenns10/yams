@@ -10,6 +10,8 @@
 .eqv	SERVER_SOCK_ACCEPT	112
 .eqv	SERVER_SOCK_CLOSE	113
 
+.eqv	SOCK_CLOSE_ALL		120	# closes all sockets
+
 # Socket Macros
 .macro sock_open(%dest_sock_reg)
 	li $v0, SOCK_OPEN
@@ -52,5 +54,10 @@
 .macro ssock_close(%ssock_reg)
 	li $v0, SERVER_SOCK_CLOSE
 	move $a0, %ssock_reg
+	syscall
+.end_macro
+
+.macro sock_close_all()
+	li $v0, SOCK_CLOSE_ALL
 	syscall
 .end_macro

@@ -19,6 +19,7 @@
 .eqv	NO_SPACE	4
 
 .eqv	MAX_REQUESTS	5
+
 .eqv	num_requests	$s7
 .eqv	request_type	$s2
 .eqv	CHUNK_SIZE	1024
@@ -48,6 +49,8 @@ filestream_buff:	.space	CHUNK_SIZE
 main:
 	li num_requests, MAX_REQUESTS
 	push(num_requests)
+	# close all open (server) sockets
+	sock_close_all()
 	li $a0, 19001		# Port = 19001
 	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
 req_loop:
