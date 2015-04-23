@@ -29,6 +29,7 @@
       }
       function load() {
           var code = document.getElementById("bf_code").value;
+          document.getElementById("load_output").innerHTML = "Loading code.";
           var url = window.location.protocol + '//' + window.location.host + '/load';
           post(url, code, function(r) {document.getElementById("load_output").innerHTML = r.responseText;});
       }
@@ -43,13 +44,13 @@
   <body>
     <h1>MIPS Brainfuck Interpreter</h1>
     <p>Enter code here:</p>
-    <input type="text" id="bf_code">
+    <textarea id="bf_code" rows="10" cols="50"></textarea><br>
     <button type="button" onclick="load()">Load!</button>
     <p id="load_output"></p>
     <p>Enter input here:</p>
-    <input type="text" id="bf_in">
+    <textarea id="bf_in" rows="10" cols="50"></textarea><br>
     <button type="button" onclick="run()">Run!</button>
     <p>Receive output here:</p>
-    <input type="text" id="bf_out">
+    <textarea id="bf_out" rows="10" cols="50"></textarea>
   </body>
 </html>
