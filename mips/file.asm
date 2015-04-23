@@ -95,7 +95,8 @@ uri_file_handle_fetch:
 	ble $a2, $zero, _uri_file_handle_fetch_return  # ble due to +1
 	
 	# Call to open and handle goes in $v0
-_uri_file_handle_fetch_file_open:	
+_uri_file_handle_fetch_file_open:
+	print(_file_path_buff)
 	la $t0, _file_path_buff
 	file_open($t0, FILE_OPEN_READ, $v0)
 	

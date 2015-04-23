@@ -46,7 +46,8 @@ filestream_buff:	.space	CHUNK_SIZE
 .text
 .globl	main
 main:
-	li $s7, MAX_REQUESTS
+	li num_requests, MAX_REQUESTS
+	push(num_requests)
 	li $a0, 19001		# Port = 19001
 	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
 req_loop:
@@ -105,12 +106,11 @@ dispatch_get:
 	jal uri_file_handle_fetch
 	# Open file@filepath
 	# confirm file exists, if not 404
-	move $t7, $v0
-	print_int($t7)
-	move $v0, $t7
+	move $s7, $v0  # save the file handle for later
+	print_int($s7)
+	move $v0, $s7
 	bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
-	move $s7, $v0 # save the file handle for later
 	jal return_200
 	move $s6, $v0
 	move $a0, $v0
@@ -179,7 +179,9 @@ dispatch_default:
 close_client_socket:
 	# we don't bother re-using connections, so we can close.
 	sock_close($s1)
+	pop(num_requests)
 	addi num_requests, num_requests, -1
+	push(num_requests)
 	bgtz num_requests, req_loop		# handle the next HTTP request
 	# end-of-program cleanup
 	ssock_close($s0)
