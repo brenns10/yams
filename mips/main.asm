@@ -82,9 +82,9 @@ req_loop:
 	print(ln)
 
 	# Request Body Length
-	print(msg4)
-	print_int($t7)
-	print(ln)
+	#print(msg4)
+	#print_int($t7)
+	#print(ln)
 
 	# Request Body
 	#print(msg3)
@@ -121,19 +121,21 @@ dispatch_get:
 	move $a2, $v0
 	sock_write($s1)
 
-stream_file:
 	print(rf_file)
+	print(ln)
+stream_file:
+	#print(rf_file)
 	li $t1, CHUNK_SIZE
 	file_read($s7, filestream_buff, $t1, $s6)
-	print_int($s6)
-	print(ln)
-	print(rf_file_done)
-	print(filestream_buff)
-	print(wt_sock)
+	#print_int($s6)
+	#print(ln)
+	#print(rf_file_done)
+	#print(filestream_buff)
+	#print(wt_sock)
 	la $a1, filestream_buff
 	move $a2, $s6
 	sock_write($s1)
-	print(wt_sock_done)
+	#print(wt_sock_done)
 	bgtz $s6, stream_file
 
 stream_file_cleanup:
@@ -221,7 +223,7 @@ _post_bf_run:
 dispatch_other:
 	# return 405 (method name not allowed)
 	jal return_method_name_not_allowed
-	move $a0, $v0
+	move $a1, $v0
 	jal strlen
 	move $a2, $v0
 	sock_write($s1)
