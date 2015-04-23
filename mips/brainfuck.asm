@@ -165,7 +165,7 @@ _bf_intrp_read: # , (read input)
 	lbu $t6, 0($a0)
         sb $t6, 0($t3)
         beq $t6, $zero, _bf_intrp_continue      # If we read '\0', don't increment
-        addi $t3, $t3, 1
+        addi $a0, $a0, 1
         j _bf_intrp_continue
 
 _bf_intrp_write: # . (write output)
