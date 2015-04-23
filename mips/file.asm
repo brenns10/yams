@@ -46,6 +46,8 @@ uri_file_handle_fetch:
 	li $v0, -2  # error condition for trying to use ../
 	bge $v0, $zero, _uri_file_handle_fetch_return  # ble due to +1
 	
+	# Start processing the URI here
+	
 	# Push base path onto path
 	la $a0, _file_path_buff
 	la $a1, default_dir
