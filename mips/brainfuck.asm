@@ -48,16 +48,16 @@ _bf_load_loop:
 	li $t3, ','
         beq $t2, $t3, _bf_load_store
 	li $t3, '['
-        beq $t2, $t3, _bf_load_store
+        beq $t2, $t3, _bf_load_increment_balance
 	li $t3, ']'
-        beq $t2, $t3, _bf_load_store
+        beq $t2, $t3, _bf_load_decrement_balance
         # Fall through for any non-coding characters.
         addi $a0, $a0, 1
         j _bf_load_loop
-_bf_increment_balance:
+_bf_load_increment_balance:
         addi $t4, $t4, 1
         j _bf_load_store
-_bf_decrement_balance:
+_bf_load_decrement_balance:
         addi $t4, $t4, -1
         blt $t4, $zero, _bf_load_balerr_return
 _bf_load_store:

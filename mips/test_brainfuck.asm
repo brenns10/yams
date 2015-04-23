@@ -13,6 +13,8 @@ test_start:     .asciiz "STARTING TESTS.\n"
 test_end:       .asciiz "FINISHED TESTS.\n"
 
 test_code1:      .asciiz "ab . a' <uskc>.[]) {w,+ -( })"
+test_code2:     .asciiz "..[]+ [<><>-,.[[-]]]]"
+test_code3:     .asciiz "[.+.+.,+-"
 
 test_str1:      .asciiz ".<>.[],+-"
 
@@ -22,6 +24,8 @@ test_str1:      .asciiz ".<>.[],+-"
 main:
         print(test_start)
 	jal test_bf_load_code
+        jal test_bf_load_extra_close
+        jal test_bf_load_extra_open
         print(test_end)
         exit(0)
 
@@ -44,6 +48,30 @@ test_bf_load_code:
         jal strcmp
         pop($ra)
         bne $v0, $zero, fail
+        j pass
+
+test_bf_load_extra_close:
+        push($ra)
+        la $a0, test_code2
+        jal bf_load_code
+        pop($ra)
+        li $t0, 2
+        bne $v0, $t0, fail      # make sure it returns balerr
+        la $t0, code_size
+        lw $t0, 0($t0)
+        bne $t0, $zero, fail    # make sure code size is zero
+        j pass
+
+test_bf_load_extra_open:
+        push($ra)
+        la $a0, test_code3
+        jal bf_load_code
+        pop($ra)
+        li $t0, 2
+        bne $v0, $t0, fail      # make sure it returns balerr
+        la $t0, code_size
+        lw $t0, 0($t0)
+        bne $t0, $zero, fail    # make sure code size is zero
         j pass
 
 
