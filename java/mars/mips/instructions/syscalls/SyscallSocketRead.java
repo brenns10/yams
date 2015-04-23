@@ -25,6 +25,7 @@ public class SyscallSocketRead extends AbstractSyscall {
 
         try {
             int bytesRead = Sockets.getSocket(fd).getInputStream().read(buff);
+            RegisterFile.updateRegister(3, bytesRead);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.toString());

@@ -442,3 +442,17 @@ _strncat_return:
         pop($t0)
         pop($ra)
         jr $ra
+
+        # memset: Fill a chunk of memory with a byte.
+        # Parameters:
+        #   $a0: Pointer to memory location to write.
+        #   $a1: Byte to write.
+        #   $a2: Amount of bytes to write.
+memset:
+        beq $a2, $zero, _memset_return
+        sb $a1, 0($a0)
+        addi $a0, $a0, 1
+        addi $a2, $a2, -1
+        j memset
+_memset_return:
+        jr $ra

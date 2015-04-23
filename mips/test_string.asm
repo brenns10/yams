@@ -25,6 +25,7 @@ test_str10:     .asciiz "string"
 test_str11:     .asciiz "abcdstring"
 test_str12:     .asciiz "abcdabcd"
 test_str13:     .asciiz "abcdstr"
+test_str14:     .asciiz ""
 
 # These are allowed to be modified.
 test_buf:       .space 4
@@ -37,6 +38,7 @@ test_buf5:      .asciiz "abcd"
 test_buf6:      .space 20
 test_buf7:      .space 4
 test_buf8:      .space 8
+test_buf9:      .asciiz "ABCD"
 
 .text
 .globl main
@@ -64,6 +66,7 @@ main:
         jal test_strncat_plenty
         jal test_strncat_lessthan_prefix
         jal test_strncat_lessthan_suffix
+        jal test_memset
         print(test_end)
         exit(0)
 
@@ -334,5 +337,23 @@ test_strncat_lessthan_suffix:
         pop($ra)
         bne $v0, $zero, fail
         j pass
+
+test_memset:
+        la $a0, test_buf9
+        li $a1, '\0'
+        li $a2, 4
+        push($ra)
+        jal memset
+        pop($ra)
+	lb $t0, 0($a0)
+        bne $t0, $zero, fail
+	lb $t0, 1($a0)
+        bne $t0, $zero, fail
+	lb $t0, 2($a0)
+        bne $t0, $zero, fail
+	lb $t0, 3($a0)
+        bne $t0, $zero, fail
+        j pass
+
 
 .include "string.asm"
