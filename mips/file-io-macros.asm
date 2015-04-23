@@ -26,7 +26,7 @@
 	li $v0, FILE_READ
 	move $a0, %filedesc
 	la $a1, %buffer_address
-	la $a2, %max_read_length
+	move $a2, %max_read_length
 	syscall
 	move %result_reg, $v0
 .end_macro
