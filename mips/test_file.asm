@@ -16,6 +16,7 @@ test_end:	.asciiz "FINISHED TESTS.\n"
 test_uri1:	.asciiz "/"
 test_uri2:	.asciiz "/minimal_page.html"
 test_uri3:	.asciiz "/invalid/invalid.txt"
+test_uri4:	.asciiz "/../../../etc/passwd"
 
 .text
 .globl main
@@ -25,6 +26,7 @@ main:
 	jal test_root_uri
 	jal test_specific_resource
 	jal test_inaccessible_resource
+	jal test_blocking_dotdot
 	
 	print(test_end)
 	exit(0)
@@ -60,6 +62,14 @@ test_specific_resource:
 test_inaccessible_resource:
 	push($ra)
 	la $a0, test_uri3
+	jal uri_file_handle_fetch
+	pop($ra)
+	
+	bge $v0, $zero, fail   # Expect to get an invalid (<0) file handle
+	j pass
+test_blocking_dotdot:
+	push($ra)
+	la $a0, test_uri4
 	jal uri_file_handle_fetch
 	pop($ra)
 	

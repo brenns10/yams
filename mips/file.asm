@@ -15,6 +15,8 @@
 default_file:	.asciiz "index.html"
 default_dir:	.asciiz "html"
 chr_slash:	.asciiz "/"
+str_up_dir:	.asciiz "../"
+
 _file_path_buff:	.byte	0:_FILE_PATH_MAX_LEN # Intentionally not -1
 
 .text
@@ -34,6 +36,17 @@ uri_file_handle_fetch:
 	
 	# Save the URI string address
 	move $s0, $a0
+	
+	# Search for attempts to move up the directory structure
+	move $a0, $s0
+	la $a1, str_up_dir
+	
+	jal substr_index_of
+	
+	li $v0, -2  # error condition for trying to use ../
+	bge $v0, $zero, _uri_file_handle_fetch_return  # ble due to +1
+	
+	# Start processing the URI here
 	
 	# Push base path onto path
 	la $a0, _file_path_buff
@@ -95,7 +108,8 @@ uri_file_handle_fetch:
 	ble $a2, $zero, _uri_file_handle_fetch_return  # ble due to +1
 	
 	# Call to open and handle goes in $v0
-_uri_file_handle_fetch_file_open:	
+_uri_file_handle_fetch_file_open:
+	print(_file_path_buff)
 	la $t0, _file_path_buff
 	file_open($t0, FILE_OPEN_READ, $v0)
 	
@@ -104,6 +118,3 @@ _uri_file_handle_fetch_return:
 	pop($s0)
 	pop($ra)
 	jr $ra
-
-# module includes
-.include "string.asm"
