@@ -18,9 +18,6 @@
 .eqv	HTTP_ERROR	3
 .eqv	NO_SPACE	4
 
-.eqv	MAX_REQUESTS	5
-
-.eqv	num_requests	$s7
 .eqv	request_type	$s2
 .eqv	CHUNK_SIZE	1024
 .data
@@ -47,10 +44,7 @@ filestream_buff:	.space	CHUNK_SIZE
 .text
 .globl	main
 main:
-	li num_requests, MAX_REQUESTS
-	push(num_requests)
-	# close all open (server) sockets
-	sock_close_all()
+	sock_close_all()	# close all open (server) sockets
 	li $a0, 19001		# Port = 19001
 	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
 req_loop:
@@ -182,10 +176,7 @@ dispatch_default:
 close_client_socket:
 	# we don't bother re-using connections, so we can close.
 	sock_close($s1)
-	pop(num_requests)
-	addi num_requests, num_requests, -1
-	push(num_requests)
-	bgtz num_requests, req_loop		# handle the next HTTP request
+	j req_loop		# handle the next HTTP request
 	# end-of-program cleanup
 	ssock_close($s0)
 	exit(0)
