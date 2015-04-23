@@ -82,10 +82,6 @@ test_bf_intrp:
         la $a0, test_code4
         jal bf_load_code
         jal bf_intrp
-        la $a0, out
-        li $v0, 34
-        syscall
-	print(out)
         la $a0, test_str2
         la $a1, out
         jal strcmp
