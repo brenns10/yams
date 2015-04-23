@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="reveal.js/css/reveal.css"/>
+    <link rel="stylesheet" href="reveal.js/css/theme/solarized.css"/>
+
+    <script src="reveal.js/lib/js/head.min.js"></script>
+    <script src="reveal.js/js/reveal.js"></script>
+  </head>
+
+  <body>
+    <div class="reveal slide" role="application">
+      <div class="slides">
+        <section>
+        <h1>yams</h1>
+        <h2>yams: the awesome MIPS server</h2>
+        <p>Stephen Brennan, Katherine Cass, Jeff Copeland</p>
+        <p>Andrew Mason, Aaron Neyer, Thomas Murphy</p>
+        </section>
+
+        <section>
+        <h1>What's yams?</h1>
+        <ul>
+          <li class="fragment">A stupid acronym</li>
+          <li class="fragment">An HTTP server written in MIPS</li>
+          <li class="fragment">Not for human consumption (Browsers are ok, though)</li>
+        </ul>
+        </section>
+
+        <section>
+        <h1>Components</h1>
+        <section>
+        Socket syscalls with MARS
+        </section>
+
+        <section>
+        <br>
+        <p>King of Swing</p>
+        <img src="ElvisPresley.jpg"/>
+        </section>
+
+        <section>
+        <br>
+        <p>King of String</p>
+        <img src="brenns10.jpeg" height="300" width="300"/>
+        </section>
+
+        <section>
+        <h2>Brainf*** Interpreter</h2>
+        <p>Via POST requests to load or run</p>
+        </section>
+        </section>
+
+        <section>
+        <h1>HTTP Compromises</h1>
+
+        <section>
+        <p>Due to time restraints and complexity, we could only implement a subset of the HTTP protocol</p>
+        </section>
+
+        <section>
+        <h2>Allowed Methods</h2>
+
+        <ul>
+          <li>GET</li>
+          <li>POST</li>
+        </ul>
+        </section>
+
+        <section>
+        <h2>Handling Large Files</h2>
+
+        <p>Identity transfer encoding</p>
+        <p>Just keep throwing bytes in a socket! Close it when you're done</p>
+        </section>
+
+        </section>
+
+        <section>
+        <h1>Demos!</h1>
+        <ul>
+          <li><a href="simple_page.html" target="_blank">Simple Page</a></li>
+          <li><a href="andy.html" target="_blank">Andy Probe</a></li>
+          <li><a href="image.html" target="_blank">Large Image</a></li>
+          <li><a href="brainfuck.html" target="_blank">BF Interpreter</a></li>
+        </ul>
+        </section>
+
+        <section>
+        <h1>Questions?</h1>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        transition: 'convex',
+      });
+    </script>
+  </body>
+</html>
