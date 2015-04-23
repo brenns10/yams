@@ -12,7 +12,7 @@ test_fail:      .asciiz "==> TEST FAILED!\n"
 test_start:     .asciiz "STARTING TESTS.\n"
 test_end:       .asciiz "FINISHED TESTS.\n"
 
-test_code1:      .asciiz "ab . a' <uskc>.[]) {w,+ -( })"
+test_code1:     .asciiz "ab . a' <uskc>.[]) {w,+ -( })"
 test_code2:     .asciiz "..[]+ [<><>-,.[[-]]]]"
 test_code3:     .asciiz "[.+.+.,+-"
 test_code4:     .asciiz "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
@@ -48,7 +48,7 @@ test_bf_load_code:
         pop($ra)
         bne $v0, $zero, fail
         la $a0, test_str1
-        la $a1, code
+        la $a1, bf_code
 	push($ra)
         jal strcmp
         pop($ra)
@@ -62,7 +62,7 @@ test_bf_load_extra_close:
         pop($ra)
         li $t0, 2
         bne $v0, $t0, fail      # make sure it returns balerr
-        la $t0, code_size
+        la $t0, bf_code_size
         lw $t0, 0($t0)
         bne $t0, $zero, fail    # make sure code size is zero
         j pass
@@ -74,7 +74,7 @@ test_bf_load_extra_open:
         pop($ra)
         li $t0, 2
         bne $v0, $t0, fail      # make sure it returns balerr
-        la $t0, code_size
+        la $t0, bf_code_size
         lw $t0, 0($t0)
         bne $t0, $zero, fail    # make sure code size is zero
         j pass
@@ -85,7 +85,7 @@ test_bf_intrp:
         jal bf_load_code
         jal bf_intrp
         la $a0, test_str2
-        la $a1, out
+        la $a1, bf_out
         jal strcmp
         pop($ra)
         bne $v0, $zero, fail
@@ -98,7 +98,7 @@ test_bf_intrp_rw:
         la $a0, test_str2
         jal bf_intrp
         la $a0, test_str2
-        la $a1, out
+        la $a1, bf_out
         jal strcmp
         pop($ra)
         bne $v0, $zero fail

@@ -9,10 +9,10 @@
 .eqv    MEMORY          32768
 
 .data
-code:           .space  CODE_BUFFER
-code_size:      .word   0
-out:            .space  OUT_BUFFER
-buffer:         .space  MEMORY
+bf_code:           .space  CODE_BUFFER
+bf_code_size:      .word   0
+bf_out:            .space  OUT_BUFFER
+bf_buffer:         .space  MEMORY
 
 .text
         # bf_load_code: Loads brainfuck code from a string.  Ignores all non-
@@ -23,7 +23,7 @@ buffer:         .space  MEMORY
         #   $v0: 0 on success, 1 on memory error, 2 on bracket balance error
 bf_load_code:
         li $t0, CODE_BUFFER
-        la $t1, code
+        la $t1, bf_code
         move $t4, $zero
 
         # $t0 - amount of code bytes remaining.
@@ -73,7 +73,7 @@ _bf_load_return:
         move $v0, $zero
         li $t1, CODE_BUFFER
         sub $t1, $t1, $t0       # Calculate size of code
-        la $t0, code_size
+        la $t0, bf_code_size
         sw $t1, 0($t0)          # Save size of code in memory.
         jr $ra
 _bf_load_memerr_return:
@@ -82,7 +82,7 @@ _bf_load_memerr_return:
 _bf_load_balerr_return:
         li $v0, 2
 _bf_load_err_return:
-        la $t0, code_size       # Make sure code_size is zero so nothing gets
+        la $t0, bf_code_size       # Make sure code_size is zero so nothing gets
         sw $zero, 0($t0)        # executed
         jr $ra
 
@@ -95,21 +95,21 @@ _bf_load_err_return:
 bf_intrp:
         # Load code start pointer into $t0.
         # Load address of last instruction in $t1.
-        la $t1, code_size
+        la $t1, bf_code_size
         lw $t1, 0($t0)
-        la $t0, code
+        la $t0, bf_code
         add $t1, $t1, $t0
         addi $t1, $t1, -1
 
         # Address of current output in $t2.
-        la $t2, out
+        la $t2, bf_out
 
         # Data pointer is $t3.
-        la $t3, buffer
+        la $t3, bf_buffer
         sb $zero, 0($t3)
 
         # Current instruction pointer is $t4 (actual instruction, $t5).
-        la $t4, code
+        la $t4, bf_code
 
         # Max data pointer, so we know when to zero memory.
         addi $t9, $t3, 1
@@ -171,7 +171,7 @@ _bf_intrp_read: # , (read input)
 _bf_intrp_write: # . (write output)
         lbu $t6, 0($t3)
         # Compute the second to last byte of output
-        la $t7, out
+        la $t7, bf_out
         addi $t7, $t7, OUT_BUFFER
         addi $t7, $t7, -2
         bgt $t2, $t7, _bf_intrp_continue        # If out of space, don't overwrite
