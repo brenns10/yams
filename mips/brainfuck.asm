@@ -96,7 +96,7 @@ bf_intrp:
         # Load code start pointer into $t0.
         # Load address of last instruction in $t1.
         la $t1, bf_code_size
-        lw $t1, 0($t0)
+        lw $t1, 0($t1)
         la $t0, bf_code
         add $t1, $t1, $t0
         addi $t1, $t1, -1
