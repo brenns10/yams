@@ -1,355 +1,43 @@
-
-%% bare_jrnl.tex
-%% V1.4a
-%% 2014/09/17
-%% by Michael Shell
-%% see http://www.michaelshell.org/
-%% for current contact information.
-%%
-%% This is a skeleton file demonstrating the use of IEEEtran.cls
-%% (requires IEEEtran.cls version 1.8a or later) with an IEEE
-%% journal paper.
-%%
-%% Support sites:
-%% http://www.michaelshell.org/tex/ieeetran/
-%% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
-%% and
-%% http://www.ieee.org/
-
-%%*************************************************************************
-%% Legal Notice:
-%% This code is offered as-is without any warranty either expressed or
-%% implied; without even the implied warranty of MERCHANTABILITY or
-%% FITNESS FOR A PARTICULAR PURPOSE! 
-%% User assumes all risk.
-%% In no event shall IEEE or any contributor to this code be liable for
-%% any damages or losses, including, but not limited to, incidental,
-%% consequential, or any other damages, resulting from the use or misuse
-%% of any information contained here.
-%%
-%% All comments are the opinions of their respective authors and are not
-%% necessarily endorsed by the IEEE.
-%%
-%% This work is distributed under the LaTeX Project Public License (LPPL)
-%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
-%% distributed and modified. A copy of the LPPL, version 1.3, is included
-%% in the base LaTeX documentation of all distributions of LaTeX released
-%% 2003/12/01 or later.
-%% Retain all contribution notices and credits.
-%% ** Modified files should be clearly indicated as such, including  **
-%% ** renaming them and changing author support contact information. **
-%%
-%% File list of work: IEEEtran.cls, IEEEtran_HOWTO.pdf, bare_adv.tex,
-%%                    bare_conf.tex, bare_jrnl.tex, bare_conf_compsoc.tex,
-%%                    bare_jrnl_compsoc.tex, bare_jrnl_transmag.tex
-%%*************************************************************************
-
-
-% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
-% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
-% *** with production work. IEEE's font choices and paper sizes can       ***
-% *** trigger bugs that do not appear when using other class files.       ***                          ***
-% The testflow support page is at:
-% http://www.michaelshell.org/tex/testflow/
-
-
-
-\documentclass[journal]{IEEEtran}
+% Report for YAMS, project in CWRU EECS 314 Spring 2015
 %
-% If IEEEtran.cls has not been installed into the LaTeX system files,
-% manually specify the path to it like:
-% \documentclass[journal]{../sty/IEEEtran}
+% Members:
+%    Stephen Brennan (smb196)
+%    Katherine Cass (krc53)
+%    Jeffrey Copeland (jpc86)
+%    Andrew Mason (ajm188)
+%    Thomas Murphy (trm70)
+%    Aaron Neyer (agn31)
 
-
-
-
-
-% Some very useful LaTeX packages include:
-% (uncomment the ones you want to load)
-
-
-% *** MISC UTILITY PACKAGES ***
-%
-%\usepackage{ifpdf}
-% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
-% compilation based on whether the output is pdf or dvi.
-% usage:
-% \ifpdf
-%   % pdf code
-% \else
-%   % dvi code
-% \fi
-% The latest version of ifpdf.sty can be obtained from:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/oberdiek/
-% Also, note that IEEEtran.cls V1.7 and later provides a builtin
-% \ifCLASSINFOpdf conditional that works the same way.
-% When switching from latex to pdflatex and vice-versa, the compiler may
-% have to be run twice to clear warning/error messages.
-
-
-
-
-
-
-% *** CITATION PACKAGES ***
-%
-%\usepackage{cite}
-% cite.sty was written by Donald Arseneau
-% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
-% \cite{} output to follow that of IEEE. Loading the cite package will
-% result in citation numbers being automatically sorted and properly
-% "compressed/ranged". e.g., [1], [9], [2], [7], [5], [6] without using
-% cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
-% \cite will automatically add leading space, if needed. Use cite.sty's
-% noadjust option (cite.sty V3.8 and later) if you want to turn this off
-% such as if a citation ever needs to be enclosed in parenthesis.
-% cite.sty is already installed on most LaTeX systems. Be sure and use
-% version 5.0 (2009-03-20) and later if using hyperref.sty.
-% The latest version can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
-% The documentation is contained in the cite.sty file itself.
-
-
-
-
-
+\documentclass[journal,10pt]{IEEEtran}
+% Will correctly load from ./
+% Explicit use of 10pt by report requirements
 
 % *** GRAPHICS RELATED PACKAGES ***
 %
 \ifCLASSINFOpdf
-  % \usepackage[pdftex]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../pdf/}{../jpeg/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+ \usepackage[pdftex]{graphicx}
 \else
-  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
-  % will default to the driver specified in the system graphics.cfg if no
-  % driver is specified.
-  % \usepackage[dvips]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../eps/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.eps}
+ \usepackage[dvips]{graphicx}
 \fi
-% graphicx was written by David Carlisle and Sebastian Rahtz. It is
-% required if you want graphics, photos, etc. graphicx.sty is already
-% installed on most LaTeX systems. The latest version and documentation
-% can be obtained at: 
-% http://www.ctan.org/tex-archive/macros/latex/required/graphics/
-% Another good source of documentation is "Using Imported Graphics in
-% LaTeX2e" by Keith Reckdahl which can be found at:
-% http://www.ctan.org/tex-archive/info/epslatex/
-%
-% latex, and pdflatex in dvi mode, support graphics in encapsulated
-% postscript (.eps) format. pdflatex in pdf mode supports graphics
-% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
-% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
-% not a bitmapped formats (.jpeg, .png). IEEE frowns on bitmapped formats
-% which can result in "jaggedy"/blurry rendering of lines and letters as
-% well as large increases in file sizes.
-%
-% You can find documentation about the pdfTeX application at:
-% http://www.tug.org/applications/pdftex
 
-
-
-
+% declare the path(s) where your graphic files are
+% \graphicspath{{../pdf/}{../jpeg/}}
+% declare graphics file extensions
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
 % *** MATH PACKAGES ***
 %
-%\usepackage[cmex10]{amsmath}
-% A popular package from the American Mathematical Society that provides
-% many useful and powerful commands for dealing with mathematics. If using
-% it, be sure to load this package with the cmex10 option to ensure that
-% only type 1 fonts will utilized at all point sizes. Without this option,
-% it is possible that some math symbols, particularly those within
-% footnotes, will be rendered in bitmap form which will result in a
-% document that can not be IEEE Xplore compliant!
-%
-% Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
-% thus preventing page breaks from occurring within multiline equations. Use:
-%\interdisplaylinepenalty=2500
-% after loading amsmath to restore such page breaks as IEEEtran.cls normally
-% does. amsmath.sty is already installed on most LaTeX systems. The latest
-% version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
-
-
-
-
-
-% *** SPECIALIZED LIST PACKAGES ***
-%
-%\usepackage{algorithmic}
-% algorithmic.sty was written by Peter Williams and Rogerio Brito.
-% This package provides an algorithmic environment fo describing algorithms.
-% You can use the algorithmic environment in-text or within a figure
-% environment to provide for a floating algorithm. Do NOT use the algorithm
-% floating environment provided by algorithm.sty (by the same authors) or
-% algorithm2e.sty (by Christophe Fiorio) as IEEE does not use dedicated
-% algorithm float types and packages that provide these will not provide
-% correct IEEE style captions. The latest version and documentation of
-% algorithmic.sty can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithms/
-% There is also a support site at:
-% http://algorithms.berlios.de/index.html
-% Also of interest may be the (relatively newer and more customizable)
-% algorithmicx.sty package by Szasz Janos:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/
-
-
-
-
-% *** ALIGNMENT PACKAGES ***
-%
-%\usepackage{array}
-% Frank Mittelbach's and David Carlisle's array.sty patches and improves
-% the standard LaTeX2e array and tabular environments to provide better
-% appearance and additional user controls. As the default LaTeX2e table
-% generation code is lacking to the point of almost being broken with
-% respect to the quality of the end results, all users are strongly
-% advised to use an enhanced (at the very least that provided by array.sty)
-% set of table tools. array.sty is already installed on most systems. The
-% latest version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/required/tools/
-
-
-% IEEEtran contains the IEEEeqnarray family of commands that can be used to
-% generate multiline equations as well as matrices, tables, etc., of high
-% quality.
-
-
-
-
-% *** SUBFIGURE PACKAGES ***
-%\ifCLASSOPTIONcompsoc
-%  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-%\else
-%  \usepackage[caption=false,font=footnotesize]{subfig}
-%\fi
-% subfig.sty, written by Steven Douglas Cochran, is the modern replacement
-% for subfigure.sty, the latter of which is no longer maintained and is
-% incompatible with some LaTeX packages including fixltx2e. However,
-% subfig.sty requires and automatically loads Axel Sommerfeldt's caption.sty
-% which will override IEEEtran.cls' handling of captions and this will result
-% in non-IEEE style figure/table captions. To prevent this problem, be sure
-% and invoke subfig.sty's "caption=false" package option (available since
-% subfig.sty version 1.3, 2005/06/28) as this is will preserve IEEEtran.cls
-% handling of captions.
-% Note that the Computer Society format requires a larger sans serif font
-% than the serif footnote size font used in traditional IEEE formatting
-% and thus the need to invoke different subfig.sty package options depending
-% on whether compsoc mode has been enabled.
-%
-% The latest version and documentation of subfig.sty can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
-
-
-
-
-% *** FLOAT PACKAGES ***
-%
-%\usepackage{fixltx2e}
-% fixltx2e, the successor to the earlier fix2col.sty, was written by
-% Frank Mittelbach and David Carlisle. This package corrects a few problems
-% in the LaTeX2e kernel, the most notable of which is that in current
-% LaTeX2e releases, the ordering of single and double column floats is not
-% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
-% single column figure to be placed prior to an earlier double column
-% figure. The latest version and documentation can be found at:
-% http://www.ctan.org/tex-archive/macros/latex/base/
-
-
-%\usepackage{stfloats}
-% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
-% the ability to do double column floats at the bottom of the page as well
-% as the top. (e.g., "\begin{figure*}[!b]" is not normally possible in
-% LaTeX2e). It also provides a command:
-%\fnbelowfloat
-% to enable the placement of footnotes below bottom floats (the standard
-% LaTeX2e kernel puts them above bottom floats). This is an invasive package
-% which rewrites many portions of the LaTeX2e float routines. It may not work
-% with other packages that modify the LaTeX2e float routines. The latest
-% version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/sttools/
-% Do not use the stfloats baselinefloat ability as IEEE does not allow
-% \baselineskip to stretch. Authors submitting work to the IEEE should note
-% that IEEE rarely uses double column equations and that authors should try
-% to avoid such use. Do not be tempted to use the cuted.sty or midfloat.sty
-% packages (also by Sigitas Tolusis) as IEEE does not format its papers in
-% such ways.
-% Do not attempt to use stfloats with fixltx2e as they are incompatible.
-% Instead, use Morten Hogholm'a dblfloatfix which combines the features
-% of both fixltx2e and stfloats:
-%
-% \usepackage{dblfloatfix}
-% The latest version can be found at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/dblfloatfix/
-
-
-
-
-%\ifCLASSOPTIONcaptionsoff
-%  \usepackage[nomarkers]{endfloat}
-% \let\MYoriglatexcaption\caption
-% \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
-%\fi
-% endfloat.sty was written by James Darrell McCauley, Jeff Goldberg and 
-% Axel Sommerfeldt. This package may be useful when used in conjunction with 
-% IEEEtran.cls'  captionsoff option. Some IEEE journals/societies require that
-% submissions have lists of figures/tables at the end of the paper and that
-% figures/tables without any captions are placed on a page by themselves at
-% the end of the document. If needed, the draftcls IEEEtran class option or
-% \CLASSINPUTbaselinestretch interface can be used to increase the line
-% spacing as well. Be sure and use the nomarkers option of endfloat to
-% prevent endfloat from "marking" where the figures would have been placed
-% in the text. The two hack lines of code above are a slight modification of
-% that suggested by in the endfloat docs (section 8.4.1) to ensure that
-% the full captions always appear in the list of figures/tables - even if
-% the user used the short optional argument of \caption[]{}.
-% IEEE papers do not typically make use of \caption[]'s optional argument,
-% so this should not be an issue. A similar trick can be used to disable
-% captions of packages such as subfig.sty that lack options to turn off
-% the subcaptions:
-% For subfig.sty:
-% \let\MYorigsubfloat\subfloat
-% \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}}
-% However, the above trick will not work if both optional arguments of
-% the \subfloat command are used. Furthermore, there needs to be a
-% description of each subfigure *somewhere* and endfloat does not add
-% subfigure captions to its list of figures. Thus, the best approach is to
-% avoid the use of subfigure captions (many IEEE journals avoid them anyway)
-% and instead reference/explain all the subfigures within the main caption.
-% The latest version of endfloat.sty and its documentation can obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/endfloat/
-%
-% The IEEEtran \ifCLASSOPTIONcaptionsoff conditional can also be used
-% later in the document, say, to conditionally put the References on a 
-% page by themselves.
-
-
-
+\usepackage[cmex10]{amsmath}
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
-%\usepackage{url}
+\usepackage{url}
 % url.sty was written by Donald Arseneau. It provides better support for
-% handling and breaking URLs. url.sty is already installed on most LaTeX
-% systems. The latest version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/url/
+% handling and breaking URLs.
 % Basically, \url{my_url_here}.
 
-
-
-
-% *** Do not adjust lengths that control margins, column widths, etc. ***
-% *** Do not use packages that alter fonts (such as pslatex).         ***
-% There should be no need to do such things with IEEEtran.cls V1.6 and later.
-% (Unless specifically asked to do so by the journal or conference you plan
-% to submit to, of course. )
+% Correctly create hyperlinks with URLs
+\usepackage{hyperref}
 
 
 % correct bad hyphenation here
@@ -364,7 +52,9 @@
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{Bare Demo of IEEEtran.cls for Journals}
+\title{YAMS: Awesome MIPS Server}
+% Title is still up for consideration
+
 %
 %
 % author names and IEEE memberships
@@ -376,14 +66,16 @@
 % was not built to handle multiple paragraphs
 %
 
-\author{Michael~Shell,~\IEEEmembership{Member,~IEEE,}
-        John~Doe,~\IEEEmembership{Fellow,~OSA,}
-        and~Jane~Doe,~\IEEEmembership{Life~Fellow,~IEEE}% <-this % stops a space
-\thanks{M. Shell is with the Department
-of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
-GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
-\thanks{J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
-\thanks{Manuscript received April 19, 2005; revised September 17, 2014.}}
+\author{
+Stephen~Brennan,
+Katherine~Cass,
+Jeffrey~Copeland,
+Andrew~Mason,
+Thomas~Murphy,
+Aaron~Neyer% stop_space
+\thanks{All authors are with the Department of Electrical Engineering and Computer Science, Case Western Reserve University, Cleveland, OH, 44106 USA}% stop_space
+\thanks{Manuscript in progress \today}
+} % Close the author environment
 
 % note the % following the last \IEEEmembership and also \thanks - 
 % these prevent an unwanted space from occurring between the last author name
@@ -406,30 +98,10 @@ GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this %
 
 
 % The paper headers
-\markboth{Journal of \LaTeX\ Class Files,~Vol.~13, No.~9, September~2014}%
-{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for Journals}
+\markboth{CWRU EECS 314 Spring 2015 Final Project}%
+{}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
-% 
-% *** Note that you probably will NOT want to include the author's ***
-% *** name in the headers of peer review papers.                   ***
-% You can use \ifCLASSOPTIONpeerreview for conditional compilation here if
-% you desire.
-
-
-
-
-% If you want to put a publisher's ID mark on the page you can do it like
-% this:
-%\IEEEpubid{0000--0000/00\$00.00~\copyright~2014 IEEE}
-% Remember, if you use this you must call \IEEEpubidadjcol in the second
-% column for its text to clear the IEEEpubid mark.
-
-
-
-% use for special paper notices
-%\IEEEspecialpapernotice{(Invited Paper)}
-
 
 
 
@@ -444,62 +116,78 @@ The abstract goes here.
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-IEEEtran, journal, \LaTeX, paper, template.
+MIPS, computer architecture, HTTP, server, MARS, ISA simulation.
 \end{IEEEkeywords}
 
+% Begin body of the report
 
-
-
-
-
-% For peer review papers, you can put extra information on the cover
-% page as needed:
-% \ifCLASSOPTIONpeerreview
-% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
-% \fi
-%
-% For peerreview papers, this IEEEtran command inserts a page break and
-% creates the second title. It will be ignored for other modes.
-\IEEEpeerreviewmaketitle
-
-
-
-\section{Introduction}
+\section{Problem Statement}
 % The very first letter is a 2 line initial drop letter followed
 % by the rest of the first word in caps.
 % 
 % form to use if the first word consists of a single letter:
 % \IEEEPARstart{A}{demo} file is ....
 % 
-% form to use if you need the single drop letter followed by
-% normal text (unknown if ever used by IEEE):
-% \IEEEPARstart{A}{}demo file is ....
-% 
-% Some journals put the first two words in caps:
-% \IEEEPARstart{T}{his demo} file is ....
-% 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
-for IEEE journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.8a and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
+\IEEEPARstart{T}{his} paragraph needs some filler: You should rar or zip your code and input/output files, along with a cover sheet with your project title, participant’s name, and instructions to run your code into a single document and send it via email.
 
-\hfill mds
- 
-\hfill September 17, 2014
 
-\subsection{Subsection Heading Here}
-Subsection text here.
+\section{Major Challenges}
 
-% needed in second column of first page if using \IEEEpubid
-%\IEEEpubidadjcol
+challenges
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\section{System Components}
 
+components
+
+\subsection{String Operations}
+
+king of string
+
+\subsection{HTTP Request Handling}
+
+requests
+
+\subsection{File Access}
+
+files
+
+\subsection{Turing Tape Language Interpreter}
+
+brainfuck
+
+\section{User Interface}
+
+interface
+
+\section{Documentation of Runs}
+
+\subsection{Static Page Content}
+
+have image
+
+\subsection{Dynamic JavaScript Content}
+
+more image
+
+\section{Group Member Contributions}
+
+\begin{LaTeXitemize} \itemsep0pt \parskip0pt
+  \item Name
+  \begin{enumerate}
+    \item Task
+    \item Task 2
+  \end{enumerate}
+  
+  \item Name 2
+  \begin{enumerate}
+    \item Task
+    \item Task 2
+  \end{enumerate}
+  
+  \item Name \ldots
+\end{LaTeXitemize}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -603,8 +291,6 @@ The conclusion goes here.
 
 
 
-
-
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
 % or
@@ -643,8 +329,6 @@ The authors would like to thank...
   \newpage
 \fi
 
-
-
 % trigger a \newpage just before the given reference
 % number - used to balance the columns on the last page
 % adjust value as needed - may need to be readjusted if
@@ -654,67 +338,9 @@ The authors would like to thank...
 %\IEEEtriggercmd{\enlargethispage{-5in}}
 
 % references section
-
-% can use a bibliography generated by BibTeX as a .bbl file
-% BibTeX documentation can be easily obtained at:
-% http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
-% The IEEEtran BibTeX style support page is at:
-% http://www.michaelshell.org/tex/ieeetran/bibtex/
-%\bibliographystyle{IEEEtran}
-% argument is your BibTeX string definitions and bibliography database(s)
-%\bibliography{IEEEabrv,../bib/paper}
-%
-% <OR> manually copy in the resultant .bbl file
-% set second argument of \begin to the number of references
-% (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-
-\end{thebibliography}
-
-% biography section
-% 
-% If you have an EPS/PDF photo (graphicx package needed) extra braces are
-% needed around the contents of the optional argument to biography to prevent
-% the LaTeX parser from getting confused when it sees the complicated
-% \includegraphics command within an optional argument. (You could create
-% your own custom macro containing the \includegraphics command to make things
-% simpler here.)
-%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
-% or if you just want to reserve a space for a photo:
-
-\begin{IEEEbiography}{Michael Shell}
-Biography text here.
-\end{IEEEbiography}
-
-% if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{John Doe}
-Biography text here.
-\end{IEEEbiographynophoto}
-
-% insert where needed to balance the two columns on the last page with
-% biographies
-%\newpage
-
-\begin{IEEEbiographynophoto}{Jane Doe}
-Biography text here.
-\end{IEEEbiographynophoto}
-
-% You can push biographies down or up by placing
-% a \vfill before or after them. The appropriate
-% use of \vfill depends on what kind of text is
-% on the last page and whether or not the columns
-% are being equalized.
-
-%\vfill
-
-% Can be used to pull up biographies so that the bottom of the last one
-% is flush with the other column.
-%\enlargethispage{-5in}
-
+\bibliography{IEEEabrv,./yams_report}
+\bibliographystyle{IEEEtran}
+\nocite{*}
 
 
 % that's all folks
