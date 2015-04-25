@@ -21,7 +21,7 @@
 \fi
 
 % declare the path(s) where your graphic files are
-% \graphicspath{{../pdf/}{../jpeg/}}
+ \graphicspath{{screenshots/}}
 % declare graphics file extensions
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
@@ -164,11 +164,36 @@ We have implemented an HTTP server, so there isn’t really a “user interface�
 
 \subsection{Static Page Content}
 
-have image
+The static page in Fig.~\ref{fig:static_document} is hosted as the \texttt{/index.html} document of the server. This is the document the user would expect to load into their browser upon access to the root page of the server. This demonstrates the ability to serve multiple resources for a page: images, fonts, and the HTML.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{static_document}
+\caption{The static \texttt{index.html} served by YAMS by default.}
+\label{fig:static_document}
+\end{figure*}
 
 \subsection{Dynamic JavaScript Content}
 
-more image
+The dynamic page in Fig.~\ref{fig:dynamic_document} is the presentation given to the class on April 23, 2015. This document uses HTML, JavaScript, and images. All resources are loaded from YAMS and not from external internet hosts.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{dynamic_document}
+\caption{The first view of a dynamic HTML/JavaScript page containing the material presented to the class.}
+\label{fig:dynamic_document}
+\end{figure*}
+
+\subsection{Interactive AJAX Content}
+
+The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the frontend interface for the YAMS server's Brainfuck\cite{Mpreu/preller} interpreter. The page interacts with the interface through POST requests and updates the text field on the page when it receives the result of running the user-supplied Brainfuck code and input.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{interactive_ajax}
+\caption{A web interface to an implementation of the Brainfuck interpreter contained within YAMS.}
+\label{fig:interactive_ajax}
+\end{figure*}
 
 \section{Group Member Contributions}
 
