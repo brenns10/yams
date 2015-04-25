@@ -39,7 +39,6 @@
 % Correctly create hyperlinks with URLs
 \usepackage{hyperref}
 
-
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -159,7 +158,7 @@ brainfuck
 
 \section{User Interface}
 
-interface
+We have implemented an HTTP server, so there isn’t really a “user interface” per se. To compile Mars with our implemented syscalls, run make from the project root. Then run \texttt{java -jar Mars4\_5-SockMod.jar}. You are now running the modified version of Mars. You can then load in the \texttt{mips/main.asm} file. Assemble and run that, and you will have a server listening on port 19001. Now, you can point your browser to any file in the \texttt{html/} directory (but leave off the \texttt{html/} part of the path - that directory is considered to be root by the server). Alternatively, you can use the unix tool \texttt{curl}.
 
 \section{Documentation of Runs}
 
