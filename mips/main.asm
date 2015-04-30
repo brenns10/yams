@@ -16,10 +16,12 @@
 .eqv	HTTP_POST	1
 .eqv	HTTP_OTHER	2
 .eqv	HTTP_ERROR	3
-.eqv	NO_SPACE	4
+
+.eqv	YAMS_PORT	19001
 
 .eqv	request_type	$s2
 .eqv	CHUNK_SIZE	1024
+
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
@@ -47,11 +49,14 @@ bf_lc_balance:	.asciiz		"Unbalanced brackets."
 filestream_buff:	.space	CHUNK_SIZE
 
 .text
+	# main: the main program loop
+	# Takes no arguments and will infinitely loop (no exit condition)
 .globl	main
 main:
-	sock_close_all()	# close all open (server) sockets
-	li $a0, 19001		# Port = 19001
-	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
+	sock_close_all()	# close all open (server) sockets for clean state
+	li $a0, YAMS_PORT	# Set the port
+	ssock_open($s0)		# open server_socket and store FD in $s0
+
 req_loop:
 	ssock_accept($s0, $s1)	# accept connection from server_socket in $s0, store client FD in $s1
 
@@ -71,36 +76,25 @@ req_loop:
 	print_int($s2)
 	print(ln)
 
+	# skip over the remaining prints in case of error
+	li $t0, HTTP_ERROR
+	beq $s2, $t0, choose_request_handler
+
 	# Request URI
 	print(msg2)
 	print_reg($s3)
 	print(ln)
 
-	# Content-Type header value
-	print(msg5)
-	print_reg($s5)
-	print(ln)
 
-	# Request Body Length
-	#print(msg4)
-	#print_int($t7)
-	#print(ln)
-
-	# Request Body
-	#print(msg3)
-	#print_reg($s4)
-	#print(ln)
-
-	#j dispatch_default
+choose_request_handler:
+	# choose a handler based on request type
 	li $t0, HTTP_GET
 	beq request_type, $t0, dispatch_get
 	li $t0, HTTP_POST
 	beq request_type, $t0, dispatch_post
 	li $t0, HTTP_OTHER
 	beq request_type, $t0, dispatch_other
-	j dispatch_default  # for now, always dispatch to the default
-	# errors will go here (e.g. insufficient space, malformed request)
-	# default case will be 405 (bad request)
+	j dispatch_default
 
 dispatch_get:
 	# Convert URI -> filepath
@@ -109,7 +103,6 @@ dispatch_get:
 	# Open file@filepath
 	# confirm file exists, if not 404
 	move $s7, $v0  # save the file handle for later
-	print_int($s7)
 	move $v0, $s7
 	bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
@@ -122,24 +115,18 @@ dispatch_get:
 	sock_write($s1)
 
 	print(rf_file)
-	print(ln)
+
 stream_file:
-	#print(rf_file)
 	li $t1, CHUNK_SIZE
 	file_read($s7, filestream_buff, $t1, $s6)
-	#print_int($s6)
-	#print(ln)
-	#print(rf_file_done)
-	#print(filestream_buff)
-	#print(wt_sock)
 	la $a1, filestream_buff
 	move $a2, $s6
 	sock_write($s1)
-	#print(wt_sock_done)
 	bgtz $s6, stream_file
 
 stream_file_cleanup:
 	print(cl_file)
+	print(ln)
 	file_close($s7)
 	j close_client_socket
 
@@ -152,7 +139,6 @@ dispatch_404:
 	move $a2, $v0
 	sock_write($s1)
 	j close_client_socket
-  
 
 dispatch_post:
 	# Simplifying Assumption -- use `curl` to trigger interpretation
@@ -216,9 +202,8 @@ _post_bf_run:
 	jal strlen
 	la $a1, bf_out
 	move $a2, $v0
-        sock_write($s1)
-        j close_client_socket
-
+	sock_write($s1)
+	j close_client_socket
 
 dispatch_other:
 	# return 405 (method name not allowed)
@@ -239,10 +224,11 @@ dispatch_default:
 	j close_client_socket
 
 close_client_socket:
-	# we don't bother re-using connections, so we can close.
+	# we do not re-use connections, so we can close.
 	sock_close($s1)
 	j req_loop		# handle the next HTTP request
-	# end-of-program cleanup
+
+	# end-of-program cleanup (dead code because no escape command available)
 	ssock_close($s0)
 	exit(0)
 
