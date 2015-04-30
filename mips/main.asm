@@ -16,7 +16,6 @@
 .eqv	HTTP_POST	1
 .eqv	HTTP_OTHER	2
 .eqv	HTTP_ERROR	3
-.eqv	NO_SPACE	4
 
 .eqv	YAMS_PORT	19001
 
