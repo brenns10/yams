@@ -162,7 +162,17 @@ files
 
 \subsection{Turing Tape Language Interpreter}
 
-brainfuck
+As an additional ``stretch'' feature, we implemented an interpreter for the
+esoteric programming language Brainfuck\cite{Mpreu/preller}.  This simple
+language simulates a Turing machine's operations and has only 8 commands (each
+of which is a single character).  The interpreter is implemented in
+\texttt{mips/brainfuck.asm}, and tested in \texttt{mips/test\_brainfuck.asm}.
+When the server is running, code can be loaded into the interpreter by sending a
+POST request to the URL \texttt{/load}.  The code can then be run by sending
+input in a POST request to the URL \texttt{/run}, which will return the program
+output in its response.  As a more simple interface, the URL
+\texttt{/brainfuck.html} contains a simple page that uses Javascript to send
+code and input, and receive output, from the interpreter.
 
 \section{User Interface}
 
