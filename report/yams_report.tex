@@ -337,6 +337,7 @@ The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the f
 The conclusion goes here.
 
 
+\appendices
 
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
@@ -351,6 +352,33 @@ The conclusion goes here.
 % \subsection or using \label (\appendices by itself
 % starts a section numbered zero.)
 %
+
+
+\onecolumn % use single column for the wide columns
+\section{Screenshots of Code Execution Results}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{static_document}
+\caption{The static \texttt{index.html} served by YAMS by default.}
+\label{fig:static_document}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{dynamic_document}
+\caption{The first view of a dynamic HTML/JavaScript page containing the material presented to the class.}
+\label{fig:dynamic_document}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{interactive_ajax}
+\caption{A web interface to an implementation of the Brainfuck interpreter contained within YAMS.}
+\label{fig:interactive_ajax}
+\end{figure}
+
+\twocolumn
 
 % use section* for acknowledgment
 \section*{Acknowledgment}
@@ -378,29 +406,6 @@ The authors would like to thank...
 \bibliographystyle{IEEEtran}
 \nocite{*}
 
-\onecolumn
-\appendix
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{static_document}
-\caption{The static \texttt{index.html} served by YAMS by default.}
-\label{fig:static_document}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{dynamic_document}
-\caption{The first view of a dynamic HTML/JavaScript page containing the material presented to the class.}
-\label{fig:dynamic_document}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth,natwidth=1440,natheight=900]{interactive_ajax}
-\caption{A web interface to an implementation of the Brainfuck interpreter contained within YAMS.}
-\label{fig:interactive_ajax}
-\end{figure}
 
 
 % that's all folks
