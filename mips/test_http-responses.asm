@@ -12,6 +12,8 @@ test_fail:      .asciiz "==> TEST FAILED!\n"
 test_start:     .asciiz "STARTING TESTS.\n"
 test_end:       .asciiz "FINISHED TESTS.\n"
 
+ln:	.asciiz		"\n"
+
 _method_name_not_allowed_resp: .asciiz "HTTP/1.1 405 METHOD NAME NOT ALLOWED\r\nConnection: Close\r\nServer: yams\r\n\r\n"
 _bad_request_resp: .asciiz "HTTP/1.1 400 BAD REQUEST\r\nConnection: Close\r\nServer: yams\r\n\r\n"
 
