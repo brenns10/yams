@@ -1,7 +1,7 @@
 ###
 # File: http-requests.asm
 #
-# Code that reads in an HTTP request and extracts relevant information
+# Code that reads in an HTTP request and extracts relevant information.
 ###
 
 
@@ -64,19 +64,20 @@ req_buff: 		.byte	0:REQ_BUFF_MAX
 
 
 .text
-	# get_request: process a request
-	# TODO: finish documentation here
-	# Parameters:
-	#   $a0: ??
+	# get_request: gets the next HTTP request from the accepted socket.
+	# Paramters:
+	#   $a0: file descriptor for the client socket
 	# Returns:
-	#   $v0: ??
-	#	$v1: ??
-	#	stack: ??
-	#	stack: ??
-	#	stack: ??
+	#   $v0: request type, one of HTTP_GET (0), HTTP_POST (1), HTTP_OTHER (2), HTTP_ERROR (3)
+	#	 - if $v0 == HTTP_ERROR, the following fields may not contain valid information
+	#   $v1: address of null-terminated request URI
+	#    -4($sp): address of the null-terminated request body
+	#    -8($sp): length of the request body
+	#   -12($sp): address of null-terminated Content-Type header value
 get_request:
 	push_all()
 _gr_read:
+	move sock_fd, $a0
 	# read the request into the buffer
 	la $a1, req_buff
 	li $a2, READ_SIZE
@@ -263,6 +264,39 @@ _match_request_type:
 	# Otherwise, we throw an error
 	j _get_request_error
 
+_read_to_length:
+_read_to_length_loop:
+	sub $t0, cur_req_buff_ptr, body_ptr
+	sub $t0, content_len, $t0
+	move $a1, cur_req_buff_ptr
+	move $a2, $t0
+	blez $a2, _match_request_type
+	sock_read(sock_fd)
+	add cur_req_buff_ptr, cur_req_buff_ptr, $v1
+	j _read_to_length_loop
+_read_all_chunks:
+	print(_gr_read_all_chunks_unsupported)
+	j _get_request_error
+
+_get_request_error:
+	li $v0, HTTP_ERROR
+	la $v1, str_empty
+_get_request_return:
+	move $t0, body_ptr
+	move $t1, content_len
+	la $t2, req_content_type_buff
+	pop_all()
+	push($t2)
+	push($t1)
+	push($t0)
+	jr $ra
+
+
+	# _get_content_len: converts value of Content-Length field to number
+	# Arguments:
+	#  $v0: address of start of Content-Length header
+	# Returns:
+	#  $v0: value of the Content-Length header
 _get_content_len:
 	push($ra)
 	# here, $v0 = start of "Content-Length:" header
@@ -297,6 +331,13 @@ _get_content_len:
 	pop($ra)
 	jr $ra
 
+
+	# _respond_to_expect: Writes out a response expected by the client.
+	#   Sometimes used in POST request for large files.
+	# Arguments:
+	#  $v0: address of start of Expect header
+	# Returns:
+	#  $v0: value of the Content-Length header
 _respond_to_expect:
 	push($ra)
 	# here, $v0 = start of "Expect:" header
@@ -325,7 +366,6 @@ _respond_to_expect:
 	la $a1, str_100continue
 	jal strcmp
 	bnez $v0, _respond_to_expect_error
-
 _write_100continue:
 	la $a0, str_100continue_response
 	jal strlen
@@ -333,13 +373,11 @@ _write_100continue:
 	la $a1, str_100continue_response
 	sock_write(sock_fd)
 	j _respond_to_expect_return
-
 _respond_to_expect_error:
 	# TODO: check the spec and see what to do in the no-match case
 	# for now, we print, but return
 	print(_gr_unsupported_expect_header)
 	print_reg(temp_ptr)
-
 _respond_to_expect_return:
 	# swap back null byte, then return
 	pop($t0)
@@ -347,6 +385,7 @@ _respond_to_expect_return:
 	sb $t2, ($t0)
 	pop($ra)
 	jr $ra
+<<<<<<< Updated upstream
 
 _read_to_length:
 _read_to_length_loop:
@@ -374,9 +413,16 @@ _get_request_return:
 	push($t1)
 	push($t0)
 	jr $ra
+=======
+>>>>>>> Stashed changes
 
 
-# parsing methods
+	# Parsing Methods
+	# _read_to_end_of_linear_whitespace: moves addr in $a0 to first non-LWS character
+	# Paramters:
+	#   $a0: address in a buffer
+	# Returns:
+	#   $v0: address of first non-LWS character
 _read_to_end_of_linear_whitespace:
 	lbu $t1, chr_space
 	lbu $t2, chr_tab
@@ -392,6 +438,12 @@ _rlws_loop:
 	move $v0, $a0
 	jr $ra
 
+
+	# _read_to_to_non_digit: moves addr in $a0 to first non-digit character
+	# Paramters:
+	#   $a0: address in a buffer
+	# Returns:
+	#   $v0: address of first non-digit character
 _read_to_non_digit:
 _rnd_loop:
 	addi $a0, $a0, 1
