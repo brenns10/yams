@@ -43,69 +43,102 @@ standard_headers: .asciiz "Connection: Close\r\nServer: yams\r\n\r\n"
 resp_buff: .byte 0:RESP_BUFF_SIZE
 
 .text
+	# return_404: send a 404 back up the connection
+	# TODO: finish documentation here
+	# Parameters:
+	#   $a0: ??
+	#	$a1: ??
+	#	$a2: ??
+	# Returns:
+	#	$v0: filled response buffer
 return_404:
-  push($ra)
+	push($ra)
 
-  la $a0, http_protocol
-  la $a1, http_not_found
-  la $a2, resp_buff
-  jal strcat
-  print(resp_buff)
-  print(ln)
+	la $a0, http_protocol
+	la $a1, http_not_found
+	la $a2, resp_buff
+	jal strcat
+	print(resp_buff)
+	print(ln)
 
-  la $a0, resp_buff
-  la $a1, standard_headers
-  la $a2, resp_buff # redundant, but here for clarity
-  jal strcat
-  print(resp_buff)
-  print(ln)
+	la $a0, resp_buff
+	la $a1, standard_headers
+	la $a2, resp_buff # redundant, but here for clarity
+	jal strcat
+	print(resp_buff)
+	print(ln)
 
-  j _return_resp
+	j _return_resp
 
+	# return_200: send a 200 back up the connection
+	# TODO: finish documentation here
+	# Parameters:
+	#   $a0: ??
+	#	$a1: ??
+	#	$a2: ??
+	# Returns:
+	#	$v0: filled response buffer
 return_200:
-  push($ra)
+	push($ra)
 
-  la $a0, http_protocol
-  la $a1, http_ok
-  la $a2, resp_buff
-  jal strcat
+	la $a0, http_protocol
+	la $a1, http_ok
+	la $a2, resp_buff
+	jal strcat
 
-  la $a0, resp_buff
-  la $a1, standard_headers
-  la $a2, resp_buff
-  jal strcat
+	la $a0, resp_buff
+	la $a1, standard_headers
+	la $a2, resp_buff
+	jal strcat
 
-  j _return_resp
+	j _return_resp
 
+	# return_method_name_not_allowed: send a not-allowed back up the connection
+	# TODO: finish documentation here
+	# Parameters:
+	#   $a0: ??
+	#	$a1: ??
+	#	$a2: ??
+	# Returns:
+	#	$v0: filled response buffer
 return_method_name_not_allowed:
-  push($ra)
+	push($ra)
 
-  la $a0, http_protocol
-  la $a1, http_method_name_not_allowed
-  la $a2, resp_buff
-  jal strcat
+	la $a0, http_protocol
+	la $a1, http_method_name_not_allowed
+	la $a2, resp_buff
+	jal strcat
 
-  la $a0, resp_buff
-  la $a1, standard_headers
-  la $a2, resp_buff
-  jal strcat
+	la $a0, resp_buff
+	la $a1, standard_headers
+	la $a2, resp_buff
+	jal strcat
 
-  j _return_resp
+	j _return_resp
 
+	# return_bad_request: send a bad-request back up the connection
+	# TODO: finish documentation here
+	# Parameters:
+	#   $a0: ??
+	#	$a1: ??
+	#	$a2: ??
+	# Returns:
+	#	$v0: filled response buffer
 return_bad_request:
-  push($ra)
+	push($ra)
 
-  la $a0, http_protocol
-  la $a1, http_bad_request
-  la $a2, resp_buff
-  jal strcat
+	la $a0, http_protocol
+	la $a1, http_bad_request
+	la $a2, resp_buff
+	jal strcat
 
-  la $a0, resp_buff
-  la $a1, standard_headers
-  la $a2, resp_buff
-  jal strcat
+	la $a0, resp_buff
+	la $a1, standard_headers
+	la $a2, resp_buff
+	jal strcat
 
+	# All functions return in the same way, so return is done here
 _return_resp:
-  pop($ra)
-  la $v0, resp_buff
-  jr $ra
+	pop($ra)
+	la $v0, resp_buff
+	jr $ra
