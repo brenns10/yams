@@ -1,8 +1,8 @@
-        ###
-        # File: brainfuck.asm
-        #
-        # Code for brainfuck interpereter.
-        ###
+###
+# File: brainfuck.asm
+#
+# Code for brainfuck interpereter.
+###
 
 .eqv    CODE_BUFFER     4096
 .eqv    OUT_BUFFER      4096
@@ -82,7 +82,7 @@ _bf_load_memerr_return:
 _bf_load_balerr_return:
         li $v0, 2
 _bf_load_err_return:
-        la $t0, bf_code_size       # Make sure code_size is zero so nothing gets
+        la $t0, bf_code_size    # Make sure code_size is zero so nothing gets
         sw $zero, 0($t0)        # executed
         jr $ra
 
@@ -164,7 +164,8 @@ _bf_intrp_prv: # < (decrement data pointer)
 _bf_intrp_read: # , (read input)
 	lbu $t6, 0($a0)
         sb $t6, 0($t3)
-        beq $t6, $zero, _bf_intrp_continue      # If we read '\0', don't increment
+        # Check if reading \0, if so, skip incrementing
+        beq $t6, $zero, _bf_intrp_continue
         addi $a0, $a0, 1
         j _bf_intrp_continue
 
@@ -174,7 +175,8 @@ _bf_intrp_write: # . (write output)
         la $t7, bf_out
         addi $t7, $t7, OUT_BUFFER
         addi $t7, $t7, -2
-        bgt $t2, $t7, _bf_intrp_continue        # If out of space, don't overwrite
+        # Check if out of space, if so, do not overwrite
+        bgt $t2, $t7, _bf_intrp_continue
         sb $t6, 0($t2)
         addi $t2, $t2, 1
         j _bf_intrp_continue
