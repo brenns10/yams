@@ -57,7 +57,6 @@ str_100continue:		.asciiz	"100-continue"
 str_100continue_response:	.asciiz	"HTTP/1.1 100 CONTINUE\r\n\r\n"
 
 # Buffers for request information
-
 req_method_buff:	.byte	0:REQ_METHOD_BUFF_MAX
 req_uri_buff:		.byte	0:REQ_URI_BUFF_MAX
 req_content_type_buff:	.byte	0:REQ_CONTENT_TYPE_BUFF_MAX
@@ -65,6 +64,16 @@ req_buff: 		.byte	0:REQ_BUFF_MAX
 
 
 .text
+	# get_request: process a request
+	# TODO: finish documentation here
+	# Parameters:
+	#   $a0: ??
+	# Returns:
+	#   $v0: ??
+	#	$v1: ??
+	#	stack: ??
+	#	stack: ??
+	#	stack: ??
 get_request:
 	push_all()
 _gr_read:
@@ -131,7 +140,7 @@ _parse_status_line:
 	la $a0, req_method_buff
 	la $a1, req_buff
 	addi $a2, req_method_len, 1	# add 1 to make space for null terminator
-	li $t0, REQ_METHOD_BUFF_MAX	# Make sure we don't overrun req_method_buff
+	li $t0, REQ_METHOD_BUFF_MAX	# Make sure we do not overrun req_method_buff
 	sgt $t1, $a2, $t0
 	movn $a2, $t0, $t1
 	jal strncpy
@@ -142,7 +151,7 @@ _parse_status_line:
 	addi $t1, req_method_len, 1
 	add $a1, $t0, $t1
 	addi $a2, req_uri_len, 1	# add 1 to make space for null terminator
-	li $t0, REQ_URI_BUFF_MAX	# make sure we don't overrun req_uri_buff
+	li $t0, REQ_URI_BUFF_MAX	# make sure we do not overrun req_uri_buff
 	sgt $t1, $a2, $t0
 	movn $a2, $t0, $t1
 	jal strncpy
@@ -216,24 +225,24 @@ _parse_content_len_headers:
 	movn content_len, $t0, $t1
 
 _check_expect:
-	# If there's a content header, respond to it
+	# If there is a content header, respond to it
 	move $a0, header_ptr
 	la $a1, str_header_Expect
 	jal substr_index_of
 	bgezal $v0, _respond_to_expect	# ...respond if it exists, and handle its request
 
-	# Remove the null-byte at headers' end
+	# Remove the null-byte at end of headers
 	pop($t1)
 	pop($t0)
 	sb $t1, ($t0)
 
-	# Read to length if there's content
+	# Read to length if there is content
 	bgtz content_len, _read_to_length
 	beq content_len, CHUNKED_TRANSFER_LEN, _read_all_chunks
-	# otherwise, assume there's no content
+	# otherwise, assume there is no content
 
 _match_request_type:
-	# see if it's a GET request
+	# see if it is a GET request
 	la $a0, req_method_buff
 	la $a1, str_GET
 	jal strcmp
@@ -242,7 +251,7 @@ _match_request_type:
 	la $v1, req_uri_buff
 	beqz  $t0, _get_request_return
 
-	# see if it's a POST request
+	# see if it is a POST request
 	la $a0, req_method_buff
 	la $a1, str_POST
 	jal strcmp
@@ -327,7 +336,7 @@ _write_100continue:
 
 _respond_to_expect_error:
 	# TODO: check the spec and see what to do in the no-match case
-	# for now, we'll print, but return
+	# for now, we print, but return
 	print(_gr_unsupported_expect_header)
 	print_reg(temp_ptr)
 
@@ -338,7 +347,7 @@ _respond_to_expect_return:
 	sb $t2, ($t0)
 	pop($ra)
 	jr $ra
-	
+
 _read_to_length:
 _read_to_length_loop:
 	sub $t0, cur_req_buff_ptr, body_ptr
@@ -395,4 +404,3 @@ _rnd_loop:
 _rnd_exit:
 	move $v0, $a0
 	jr $ra
-	 
