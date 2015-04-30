@@ -69,7 +69,7 @@ req_buff: 		.byte	0:REQ_BUFF_MAX
 	#   $a0: file descriptor for the client socket
 	# Returns:
 	#   $v0: request type, one of HTTP_GET (0), HTTP_POST (1), HTTP_OTHER (2), HTTP_ERROR (3)
-	#	 - if $v0 == HTTP_ERROR, the following fields may not contain valid information
+	#     - if $v0 == HTTP_ERROR, the following fields may not contain valid information
 	#   $v1: address of null-terminated request URI
 	#    -4($sp): address of the null-terminated request body
 	#    -8($sp): length of the request body
@@ -385,36 +385,6 @@ _respond_to_expect_return:
 	sb $t2, ($t0)
 	pop($ra)
 	jr $ra
-<<<<<<< Updated upstream
-
-_read_to_length:
-_read_to_length_loop:
-	sub $t0, cur_req_buff_ptr, body_ptr
-	sub $t0, content_len, $t0
-	move $a1, cur_req_buff_ptr
-	move $a2, $t0
-	blez $a2, _match_request_type
-	sock_read(sock_fd)
-	add cur_req_buff_ptr, cur_req_buff_ptr, $v1
-	j _read_to_length_loop
-
-_read_all_chunks:
-	print(_gr_read_all_chunks_unsupported)
-	j _get_request_error
-_get_request_error:
-	li $v0, HTTP_ERROR
-	la $v1, str_empty
-_get_request_return:
-	move $t0, body_ptr
-	move $t1, content_len
-	la $t2, req_content_type_buff
-	pop_all()
-	push($t2)
-	push($t1)
-	push($t0)
-	jr $ra
-=======
->>>>>>> Stashed changes
 
 
 	# Parsing Methods
