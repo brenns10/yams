@@ -18,8 +18,11 @@
 .eqv	HTTP_ERROR	3
 .eqv	NO_SPACE	4
 
+.eqv	YAMS_PORT	19001
+
 .eqv	request_type	$s2
 .eqv	CHUNK_SIZE	1024
+
 .data
 msg0:	.asciiz		"Request Method Type: "
 msg1:	.asciiz		"Request Method (string): "
@@ -47,11 +50,14 @@ bf_lc_balance:	.asciiz		"Unbalanced brackets."
 filestream_buff:	.space	CHUNK_SIZE
 
 .text
+	# main: the main program loop
+	# Takes no arguments and will infinitely loop (no exit condition)
 .globl	main
 main:
-	sock_close_all()	# close all open (server) sockets
-	li $a0, 19001		# Port = 19001
-	ssock_open($s0)		# open server_socket on 19001 and store FD in $s0
+	sock_close_all()	# close all open (server) sockets for clean state
+	li $a0, YAMS_PORT	# Set the port
+	ssock_open($s0)		# open server_socket and store FD in $s0
+
 req_loop:
 	ssock_accept($s0, $s1)	# accept connection from server_socket in $s0, store client FD in $s1
 
@@ -123,6 +129,7 @@ dispatch_get:
 
 	print(rf_file)
 	print(ln)
+
 stream_file:
 	#print(rf_file)
 	li $t1, CHUNK_SIZE
@@ -152,7 +159,6 @@ dispatch_404:
 	move $a2, $v0
 	sock_write($s1)
 	j close_client_socket
-  
 
 dispatch_post:
 	# Simplifying Assumption -- use `curl` to trigger interpretation
@@ -216,9 +222,8 @@ _post_bf_run:
 	jal strlen
 	la $a1, bf_out
 	move $a2, $v0
-        sock_write($s1)
-        j close_client_socket
-
+	sock_write($s1)
+	j close_client_socket
 
 dispatch_other:
 	# return 405 (method name not allowed)
@@ -239,10 +244,11 @@ dispatch_default:
 	j close_client_socket
 
 close_client_socket:
-	# we don't bother re-using connections, so we can close.
+	# we do not re-use connections, so we can close.
 	sock_close($s1)
 	j req_loop		# handle the next HTTP request
-	# end-of-program cleanup
+
+	# end-of-program cleanup (dead code because no escape command available)
 	ssock_close($s0)
 	exit(0)
 
