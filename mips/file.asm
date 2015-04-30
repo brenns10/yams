@@ -21,6 +21,7 @@ default_file:	.asciiz "index.html"
 default_dir:	.asciiz "html"
 chr_slash:	.asciiz "/"
 str_up_dir:	.asciiz "../"
+prnt_fpb_msg:	.asciiz "Opening file: "
 
 _file_path_buff:	.byte	0:_FILE_PATH_MAX_LEN # Intentionally not -1
 
@@ -115,7 +116,9 @@ uri_file_handle_fetch:
 
 	# Call to open and handle goes in $v0
 _uri_file_handle_fetch_file_open:
+	print(prnt_fpb_msg)
 	print(_file_path_buff)
+	print(ln)
 	la $t0, _file_path_buff
 	file_open($t0, FILE_OPEN_READ, $v0)
 	# Now have potential file handle in $v0 for returning, done processing

@@ -76,36 +76,25 @@ req_loop:
 	print_int($s2)
 	print(ln)
 
+	# skip over the remaining prints in case of error
+	li $t0, HTTP_ERROR
+	beq $s2, $t0, choose_request_handler
+
 	# Request URI
 	print(msg2)
 	print_reg($s3)
 	print(ln)
 
-	# Content-Type header value
-	print(msg5)
-	print_reg($s5)
-	print(ln)
 
-	# Request Body Length
-	#print(msg4)
-	#print_int($t7)
-	#print(ln)
-
-	# Request Body
-	#print(msg3)
-	#print_reg($s4)
-	#print(ln)
-
-	#j dispatch_default
+choose_request_handler:
+	# choose a handler based on request type
 	li $t0, HTTP_GET
 	beq request_type, $t0, dispatch_get
 	li $t0, HTTP_POST
 	beq request_type, $t0, dispatch_post
 	li $t0, HTTP_OTHER
 	beq request_type, $t0, dispatch_other
-	j dispatch_default  # for now, always dispatch to the default
-	# errors will go here (e.g. insufficient space, malformed request)
-	# default case will be 405 (bad request)
+	j dispatch_default
 
 dispatch_get:
 	# Convert URI -> filepath
@@ -114,7 +103,6 @@ dispatch_get:
 	# Open file@filepath
 	# confirm file exists, if not 404
 	move $s7, $v0  # save the file handle for later
-	print_int($s7)
 	move $v0, $s7
 	bltz $v0, dispatch_404
 	# if so, build a 200 w/ the data
@@ -127,25 +115,18 @@ dispatch_get:
 	sock_write($s1)
 
 	print(rf_file)
-	print(ln)
 
 stream_file:
-	#print(rf_file)
 	li $t1, CHUNK_SIZE
 	file_read($s7, filestream_buff, $t1, $s6)
-	#print_int($s6)
-	#print(ln)
-	#print(rf_file_done)
-	#print(filestream_buff)
-	#print(wt_sock)
 	la $a1, filestream_buff
 	move $a2, $s6
 	sock_write($s1)
-	#print(wt_sock_done)
 	bgtz $s6, stream_file
 
 stream_file_cleanup:
 	print(cl_file)
+	print(ln)
 	file_close($s7)
 	j close_client_socket
 
