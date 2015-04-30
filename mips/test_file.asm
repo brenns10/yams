@@ -77,3 +77,4 @@ test_blocking_dotdot:
 	j pass
 
 .include "file.asm"
+.include "string.asm"
