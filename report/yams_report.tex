@@ -132,7 +132,11 @@ MIPS, computer architecture, HTTP, server, MARS, ISA simulation.
 %
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{he} goal of this project was to write a static HTTP server in MIPS and MARS. The server would be able to serve a website, which is contained in the \texttt{html/} directory on port 19001, which can be viewed in a browser. Sockets were used for networking and were made available to MIPS by extending MARS syscalls.
+\IEEEPARstart{T}{he} goal of this project was to write a static HTTP server in
+MIPS and MARS. The server would be able to serve a website, which is contained
+in the \texttt{html/} directory on port 19001, which can be viewed in a browser.
+Sockets were used for networking and were made available to MIPS by extending
+MARS syscalls.
 
 
 \section{Major Challenges}
@@ -142,18 +146,18 @@ MARS was chosen early on because it allowed for custom syscalls; however,
 limited documentation is available. This required us to learn about MARS
 through lots of trial-and-error. Additionally, if one stops MARS while
 waiting on a socket syscall, the system enters weird error states, forcing
-us to either 1) double-reassmble-run the program, or 2) restart all of MARS.
+us to either 1) double-reassemble-run the program, or 2) restart all of MARS.
 This made debugging much slower than a normal MIPS program.
 
-The larger challenge in implementing YAMS was parsing HTTP requests. RFC 2616,
-our HTTP reference for this project, is 175 pages long, While it is possible
-to implement a full HTTP stack in assembly, it is difficult to do in a month
-or two. Thus, we focused on what was required to get webpages to display in a
-browser: GET, POST, Expect, and only identity encoding or Content-Length.
-Additionally, because the request parser had to interact with the socket
-depending on various headers (e.g. Transfer-Encoding, Content-Length, and
-Expect,) Testing and debugging revolved around trial-and-error requests
-with CURL or a browser.
+The larger challenge in implementing YAMS was parsing HTTP requests. RFC
+2616\cite{Leach}, our HTTP (Hypertext Transfer Protocol) reference for this
+project, is 175 pages long, While it is possible to implement a full HTTP stack
+in assembly, it is difficult to do in a month or two. Thus, we focused on what
+was required to get webpages to display in a browser: GET, POST, Expect, and
+only identity encoding or Content-Length. Additionally, because the request
+parser had to interact with the socket depending on various headers (e.g.
+Transfer-Encoding, Content-Length, and Expect) Testing and debugging revolved
+around trial-and-error requests with the Unix program \texttt{curl} or a browser.
 
 \section{System Components}
 
@@ -175,19 +179,32 @@ that file as the main file, instead of \texttt{mips/main.asm}.
 
 As mentioned in Major Challenges, our focus with request parsing was on serving
 a page that a browser could render. Therefore, we support a subset of HTTP
-request statuses (i.e. GET, POST,) look for a few headers (i.e. Content-Length,
-Expect,) and read or write accordingly. The logic for request parsing is in
-\texttt{http-requests.asm}, and is reached trhough the \texttt{get\_request}
+request statuses (e.g. GET, POST) look for a few headers (e.g. Content-Length,
+Expect) and read or write accordingly. The logic for request parsing is in
+\texttt{http-requests.asm}, and is reached through the \texttt{get\_request}
 method from main, returning an internal HTTP request type, and, as applicable, 
 request URI, request body, request body length, and content type. The main
 method takes this data, and hands it off to the file loader and response builder.
-The request parse was considered working through trial-and-error, seeing if debug
-prints contained the right information and if the browser loaded the page
-properly.
+
+The request parser was determined to be working through trial-and-error, seeing
+if debug prints contained the right information and if the browser loaded the
+page properly. The mixture of MIPS assembly and MARS syscall extensions
+precluded the use of unit tests to verify the correctness of the parser's
+behavior.
 
 \subsection{File Access}
 
-files
+Accessing files was already possible through MARS syscalls, saving us the
+trouble of adding this feature to the simulator. These calls were wrapped in
+function-like macros for ease of use.
+
+Additionally, the HTTP handling receives URIs (uniform resource identifiers),
+not system paths. These strings needed processing to produce a valid file path
+that could be consumed by the MARS syscall. Our processing, implemented in
+\texttt{mips/file.asm}, is composed of substring-blacklisting to prevent the
+\texttt{../} directory from being used to escape into uncontrolled resources and
+using the string operations library to modify the URI into a useful file path.
+The processing testing file is \texttt{mips/test\_file.asm}.
 
 \subsection{Turing Tape Language Interpreter}
 
@@ -205,21 +222,38 @@ code and input, and receive output, from the interpreter.
 
 \section{User Interface}
 
-We have implemented an HTTP server, so there isn’t really a “user interface” per se. To compile Mars with our implemented syscalls, run make from the project root. Then run \texttt{java -jar Mars4\_5-SockMod.jar}. You are now running the modified version of Mars. You can then load in the \texttt{mips/main.asm} file. Assemble and run that, and you will have a server listening on port 19001. Now, you can point your browser to any file in the \texttt{html/} directory (but leave off the \texttt{html/} part of the path - that directory is considered to be root by the server). Alternatively, you can use the unix tool \texttt{curl}.
+We have implemented an HTTP server, so there isn’t really a “user interface” per
+se. To compile Mars with our implemented syscalls, run make from the project
+root. Then run \texttt{java -jar Mars4\_5-SockMod.jar}. You are now running the
+modified version of Mars. You can then load in the \texttt{mips/main.asm} file.
+Assemble and run that, and you will have a server listening on port 19001. Now,
+you can point your browser to any file in the \texttt{html/} directory (but
+leave off the \texttt{html/} part of the path - that directory is considered to
+be root by the server). Alternatively, you can use the unix tool \texttt{curl}.
 
 \section{Documentation of Runs}
 
 \subsection{Static Page Content}
 
-The static page in Fig.~\ref{fig:static_document} is hosted as the \texttt{/index.html} document of the server. This is the document the user would expect to load into their browser upon access to the root page of the server. This demonstrates the ability to serve multiple resources for a page: images, fonts, and the HTML.
+The static page in Fig.~\ref{fig:static_document} is hosted as the
+\texttt{/index.html} document of the server. This is the document the user would
+expect to load into their browser upon access to the root page of the server.
+This demonstrates the ability to serve multiple resources for a page: images,
+fonts, and the HTML.
 
 \subsection{Dynamic JavaScript Content}
 
-The dynamic page in Fig.~\ref{fig:dynamic_document} is the presentation given to the class on April 23, 2015. This document uses HTML, JavaScript, and images. All resources are loaded from YAMS and not from external internet hosts.
+The dynamic page in Fig.~\ref{fig:dynamic_document} is the presentation given to
+the class on April 23, 2015. This document uses HTML, JavaScript, and images.
+All resources are loaded from YAMS and not from external internet hosts.
 
 \subsection{Interactive AJAX Content}
 
-The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the frontend interface for the YAMS server's Brainfuck\cite{Mpreu/preller} interpreter. The page interacts with the interface through POST requests and updates the text field on the page when it receives the result of running the user-supplied Brainfuck code and input.
+The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the
+frontend interface for the YAMS server's Brainfuck\cite{Mpreu/preller}
+interpreter. The page interacts with the interface through POST requests and
+updates the text field on the page when it receives the result of running the
+user-supplied Brainfuck code and input.
 
 \section{Group Member Contributions}
 
@@ -239,7 +273,7 @@ The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the f
   \item Jeffrey Copeland
   \begin{enumerate}
     \item Socket Syscalls
-    \item HTTP Request Handlign
+    \item HTTP Request Handling
   \end{enumerate}
 
   \item Andrew Mason
@@ -250,8 +284,9 @@ The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the f
 
   \item Thomas Murphy
   \begin{enumerate}
-    \item Task
-    \item Task 2
+    \item File access
+    \item Code formatting and style
+    \item Report organization and typesetting
   \end{enumerate}
 
   \item Aaron Neyer
