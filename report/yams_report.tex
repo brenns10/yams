@@ -203,8 +203,11 @@ not system paths. These strings needed processing to produce a valid file path
 that could be consumed by the MARS syscall. Our processing, implemented in
 \texttt{mips/file.asm}, is composed of substring-blacklisting to prevent the
 \texttt{../} directory from being used to escape into uncontrolled resources and
-using the string operations library to modify the URI into a useful file path.
-The processing testing file is \texttt{mips/test\_file.asm}.
+string operations to modify the URI into a useful file path. The file path is
+created using the default \texttt{html/} directory (where our web resources are
+stored) and URIs with a trailing \texttt{/} have the file name
+\texttt{index.html} appended.The processing operation has tests implemented in
+\texttt{mips/test\_file.asm}.
 
 \subsection{Turing Tape Language Interpreter}
 
@@ -445,7 +448,9 @@ The conclusion goes here.
 \section*{Acknowledgment}
 
 
-The authors would like to thank Cameron Gutman \texttt{\url{https://github.com/cgutman}} for providing information about the usage of identity transfer encoding.
+The authors would like to thank Cameron Gutman
+\texttt{\url{https://github.com/cgutman}} for providing information about the
+usage of identity transfer encoding.
 
 
 % Can use something like this to put references on a page
