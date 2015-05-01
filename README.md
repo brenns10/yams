@@ -36,7 +36,7 @@ this by cloning the repository, you'll need to load the submodule.
 
 This has been tested on Linux and Mac.  It almost certainly supports Windows,
 however we have not tested this.  We cannot guarantee lack of unexpected
-behavior.
+behavior.  Our extension to MARS requires Java 7+ to compile correctly.
 
   - Run `make mars`
   - Call `java -jar Mars4_5-SockMod.jar` (or double click the JAR, or something)
