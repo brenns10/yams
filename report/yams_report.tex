@@ -137,7 +137,23 @@ MIPS, computer architecture, HTTP, server, MARS, ISA simulation.
 
 \section{Major Challenges}
 
-challenges
+One major challenge in YAMS was implementing socket syscalls.
+MARS was chosen early on because it allowed for custom syscalls; however,
+limited documentation is available. This required us to learn about MARS
+through lots of trial-and-error. Additionally, if one stops MARS while
+waiting on a socket syscall, the system enters weird error states, forcing
+us to either 1) double-reassmble-run the program, or 2) restart all of MARS.
+This made debugging much slower than a normal MIPS program.
+
+The larger challenge in implementing YAMS was parsing HTTP requests. RFC 2616,
+our HTTP reference for this project, is 175 pages long, While it is possible
+to implement a full HTTP stack in assembly, it is difficult to do in a month
+or two. Thus, we focused on what was required to get webpages to display in a
+browser: GET, POST, Expect, and only identity encoding or Content-Length.
+Additionally, because the request parser had to interact with the socket
+depending on various headers (e.g. Transfer-Encoding, Content-Length, and
+Expect,) Testing and debugging revolved around trial-and-error requests
+with CURL or a browser.
 
 \section{System Components}
 
@@ -157,7 +173,17 @@ that file as the main file, instead of \texttt{mips/main.asm}.
 
 \subsection{HTTP Request Handling}
 
-requests
+As mentioned in Major Challenges, our focus with request parsing was on serving
+a page that a browser could render. Therefore, we support a subset of HTTP
+request statuses (i.e. GET, POST,) look for a few headers (i.e. Content-Length,
+Expect,) and read or write accordingly. The logic for request parsing is in
+\texttt{http-requests.asm}, and is reached trhough the \texttt{get\_request}
+method from main, returning an internal HTTP request type, and, as applicable, 
+request URI, request body, request body length, and content type. The main
+method takes this data, and hands it off to the file loader and response builder.
+The request parse was considered working through trial-and-error, seeing if debug
+prints contained the right information and if the browser loaded the page
+properly.
 
 \subsection{File Access}
 
