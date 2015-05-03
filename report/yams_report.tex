@@ -76,7 +76,7 @@ Andrew~Mason,
 Thomas~Murphy,
 Aaron~Neyer% stop_space
 \thanks{All authors are with the Department of Electrical Engineering and Computer Science, Case Western Reserve University, Cleveland, OH, 44106 USA}% stop_space
-\thanks{Final Report submitted May 1, 2015, typographical revisions \today}
+\thanks{Final Report submitted May 1, 2015, typographical revisions and clarifications \today}
 } % Close the author environment
 
 % note the % following the last \IEEEmembership and also \thanks -
@@ -133,10 +133,10 @@ MIPS, computer architecture, HTTP, server, MARS, ISA simulation.
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
 \IEEEPARstart{T}{he} goal of this project was to write a static HTTP server in
-MIPS and MARS. The server would be able to serve a website, which is contained
-in the \texttt{html/} directory on port 19001, which can be viewed in a browser.
-Sockets were used for networking and were made available to MIPS by extending
-MARS syscalls.
+MIPS assembly running in the MARS simulator. The server would be able to serve a
+website, which is contained in the \texttt{html/} directory on port 19001, which
+can be viewed in a browser. Sockets were used for networking and were made
+available to MIPS by extending MARS syscalls.
 
 
 \section{Major Challenges}
@@ -205,9 +205,9 @@ that could be consumed by the MARS syscall. Our processing, implemented in
 \texttt{../} directory from being used to escape into uncontrolled resources and
 string operations to modify the URI into a useful file path. The file path is
 created using the default \texttt{html/} directory (where our web resources are
-stored) and URIs with a trailing \texttt{/} have the file name
-\texttt{index.html} appended.The processing operation has tests implemented in
-\texttt{mips/test\_file.asm}.
+stored) as the base relative file path and URIs with a trailing \texttt{/} have
+the file name \texttt{index.html} appended. The processing operation has tests
+implemented in \texttt{mips/test\_file.asm}.
 
 \subsection{Turing Tape Language Interpreter}
 
@@ -225,28 +225,29 @@ code and input, and receive output, from the interpreter.
 
 \section{Component Integration}
 
-In order to integrate these several different components, we had to define and
-follow a strict ``calling convention.''  We decided that all functions would be
-called using the \texttt{AL} instruction.  Only the \texttt{\$s0-\$s7} saved
-registers, and global pointers, were to be preserved across function calls.
-Arguments were passed (and not necessarily preserved) in the \texttt{\$a0-\$a3}
-registers, and return values were placed in the \texttt{\$v0-\$v1} registers.
-Any additional arguments or return values were to be placed on the stack.
-Additionally, it is the caller's responsibility to push any registers which it
-wants preserved to the stack.  To facilitate these rules, we defined macros in
-\texttt{mips/util-macros.asm} for pushing and popping from the stack, to make
-that operation semantically clear in our code.
+In order to integrate these different components into a cohesive project, we had
+to define and follow a strict ``calling convention.''  We decided that all
+functions would be called using the \texttt{JAL} instruction.  Only the
+\texttt{\$s0-\$s7} saved registers, and global pointers, were to be preserved
+across function calls. Arguments were passed (and not necessarily preserved) in
+the \texttt{\$a0-\$a3} registers, and return values were placed in the
+\texttt{\$v0-\$v1} registers. Any additional arguments or return values were to
+be placed on the stack. It was the caller's responsibility to push any other
+registers which it wants preserved to the stack.  To facilitate these rules, we
+defined macros in \texttt{mips/util-macros.asm} for pushing and popping from the
+stack, to make that operation semantically clear in our code.
 
 \section{User Interface}
 
 We have implemented an HTTP server, so there isn't really a ``user interface''
-per se. To compile Mars with our implemented syscalls, run make from the project
-root. Then run \texttt{java -jar Mars4\_5-SockMod.jar}. You are now running the
-modified version of Mars. You can then load in the \texttt{mips/main.asm} file.
-Assemble and run that, and you will have a server listening on port 19001. Now,
-you can point your browser to any file in the \texttt{html/} directory (but
-leave off the \texttt{html/} part of the path - that directory is considered to
-be root by the server). Alternatively, you can use the Unix tool \texttt{curl}.
+per se. To compile MARS with our implemented syscalls, run \texttt{make} from
+the project root. Then run \texttt{java -jar Mars4\_5-SockMod.jar}. You are now
+running the modified version of MARS. You can then load in the
+\texttt{mips/main.asm} file. Assemble and run that, and you will have a server
+listening on port 19001 (\url{http://localhost:19001/}). Now, you can point your
+browser to any file in the \texttt{html/} directory. Leave off the
+\texttt{html/} part of the path - that directory is considered to be root by the
+server. Alternatively, you can use the Unix tool \texttt{curl}.
 
 \section{Documentation of Runs}
 
@@ -266,7 +267,7 @@ All resources are loaded from YAMS and not from external internet hosts.
 
 \subsection{Interactive AJAX Content}
 
-The final dynamic-content page shown in Fig.~\ref{fig:interactive_ajax} is the
+The final dynamic-content page, shown in Fig.~\ref{fig:interactive_ajax}, is the
 front end interface for the YAMS server's Brainfuck\cite{Mpreu/preller}
 interpreter. The page interacts with the interface through POST requests and
 updates the text field on the page when it receives the result of running the
@@ -289,14 +290,14 @@ user-supplied Brainfuck code and input.
 
   \item Jeffrey Copeland
   \begin{enumerate}
-    \item Socket Syscalls
-    \item HTTP Request Handling
+    \item Socket syscalls
+    \item HTTP request handling
   \end{enumerate}
 
   \item Andrew Mason
   \begin{enumerate}
-    \item HTTP Response Building
-    \item Project Presentation
+    \item HTTP response building
+    \item Project presentation
   \end{enumerate}
 
   \item Thomas Murphy
@@ -409,9 +410,9 @@ complete it due to personal circumstances.
 
 
 \section{Conclusion}
-We started this project to build a simple web server in MIPS. Despite the
-high upfront workload, our collective components merged into what has been caled
-"a surprsingly robust webserver". Thus, we have achieved our goal: successfully
+We started this project to build a simple web server in MIPS. Despite the high
+upfront workload, our collective components merged into what has been caled ``a
+surprsingly robust webserver.'' Thus, we have achieved our goal: successfully
 building a static webserver in MIPS and MARS.
 
 
