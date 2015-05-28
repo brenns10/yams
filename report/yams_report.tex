@@ -90,19 +90,20 @@ MIPS, computer architecture, HTTP, server, MARS, ISA simulation.
 \IEEEPARstart{T}{he} goal of this project was to write a static HTTP server in
 MIPS assembly running in the MARS simulator. The server would be able to serve a
 website, which is contained in the \texttt{html/} directory on port 19001. The
-content can then be viewed in a browser. Sockets were used for networking and
-were made available to MIPS by extending MARS syscalls.
+content would then be viewable in a browser. Sockets would be used for
+networking and implemented in extending MARS syscalls, making the high-level
+networking features accessible from simulated MIPS assembly.
 
 
 \section{Major Challenges}
 
-One major challenge in YAMS was implementing socket syscalls. MARS was chosen
-early on because it allowed for custom syscalls; however, we only found sparse
-documentation. This required us to learn about MARS through trial and error.
-Additionally, if one stops MARS while waiting on a socket syscall, the simulator
-enters an error state, forcing us to either 1) double-reassemble-run the
-program, or 2) restart all of MARS. These additional steps made debugging much
-slower than simulating a program without the unexpected behavior of the
+The first major challenge in YAMS was implementing socket syscalls. MARS was
+chosen early on because it allowed for custom syscalls; however, we only found
+sparse documentation. This required us to learn about MARS through trial and
+error. Additionally, if one stops MARS while waiting on a socket syscall, the
+simulator enters an error state, forcing us to either 1) double-reassemble-run
+the program, or 2) restart all of MARS. These additional steps made debugging
+much slower than simulating a program without the unexpected behavior of the
 Java/MARS sockets.
 
 The larger challenge in implementing YAMS was parsing HTTP requests. RFC
@@ -111,9 +112,10 @@ project, is 175 pages long. While it is possible to implement a full HTTP stack
 in assembly, it is difficult to do in one or two months. Thus, we focused on
 what was required to get web pages to display in a browser: GET, POST, Expect,
 and only identity encoding or Content-Length. Additionally, because the request
-parser had to interact with the socket depending on various headers (e.g.
-Transfer-Encoding, Content-Length, and Expect). Testing and debugging revolved
-around trial-and-error requests with the Unix program \texttt{curl} and browsers.
+parser had to interact with the socket differently depending on the request
+header (e.g. Transfer-Encoding, Content-Length, and Expect), our testing and
+debugging revolved around trial-and-error requests with the Unix program
+\texttt{curl} and browsers.
 
 \section{System Components}
 
@@ -122,12 +124,12 @@ After submission of the report, the entirety of the implementation is available 
 \subsection{String Operations}
 
 In order to parse HTTP requests, we needed to implement much of the C standard
-string library.  In \texttt{mips/string.asm}, we implemented \texttt{strlen},
+string library. In \texttt{mips/string.asm}, we implemented \texttt{strlen},
 \texttt{strncpy}, \texttt{memcpy}, \texttt{strcmp}, \texttt{strncmp},
 \texttt{atoi}, \texttt{htoi}, \texttt{strcat}, \texttt{strncat}, as well as two
 functions for identifying the index of characters and substrings,
-\texttt{str\_index\_of} and \texttt{substr\_index\_of} respectively.  To verify
-their correctness, we wrote tests in \texttt{mips/test\_string.asm}.  They can
+\texttt{str\_index\_of} and \texttt{substr\_index\_of} respectively. To verify
+their correctness, we wrote tests in \texttt{mips/test\_string.asm}. They can
 be run in MARS by loading that file as the main file, instead of
 \texttt{mips/main.asm}.
 
@@ -143,8 +145,8 @@ internal HTTP request type, and, as applicable, request URI, request body,
 request body length, and content type. The main method takes this data and
 hands it off to the file loader and response builder.
 
-The request parser functionality was validated through trial-and-error, seeing
-if debug prints contained the right information, and if the browser loaded the
+The request parser functionality was validated through trial-and-error: seeing
+if debug prints contained the right information and if the browser loaded the
 page properly. The mixture of MIPS assembly and MARS syscall extensions
 precluded the use of unit tests to verify the correctness of the parser's
 behavior in the given time.
@@ -159,7 +161,7 @@ Additionally, the HTTP handling receives URIs (uniform resource identifiers),
 not system paths. These strings needed processing to produce a valid file path
 that could be consumed by the MARS syscall. Our processing, implemented in
 \texttt{mips/file.asm}, is composed of substring-blacklisting to prevent the
-\texttt{../} directory from being used to escape into uncontrolled resources and
+\texttt{../} directory from being used to access arbitrary system resources and
 string operations to modify the URI into a useful file path. The file path is
 created using the default \texttt{html/} directory (where our web resources are
 stored) as the base relative file path and URIs with a trailing \texttt{/} have
@@ -169,30 +171,30 @@ implemented in \texttt{mips/test\_file.asm}.
 \subsection{Turing Tape Language Interpreter}
 
 As an additional stretch feature, we implemented an interpreter for the
-esoteric programming language Brainfuck\cite{Mpreu/preller}.  This simple
+esoteric programming language Brainfuck\cite{Mpreu/preller}. This simple
 language simulates a Turing machine's operations and has only 8 commands (each
-of which is a single character).  The interpreter is implemented in
+of which is a single character). The interpreter is implemented in
 \texttt{mips/brainfuck.asm}, and tested in \texttt{mips/test\_brainfuck.asm}.
 When the server is running, code can be loaded into the interpreter by sending a
-POST request to the URL \texttt{/load}.  The code can then be run by sending
+POST request to the URL \texttt{/load}. The code can then be run by sending
 input in a POST request to the URL \texttt{/run}, which will return the program
-output in its response.  For a more accessible interface, the URL
+output in its response. For a more accessible interface, the URL
 \texttt{/brainfuck.html} provides a simple page that uses JavaScript to transfer
 the code and input to the interpreter and receive the resultant output.
 
 \section{Component Integration}
 
 In order to integrate these different components into a cohesive project, we had
-to define and follow a strict calling convention.  We decided that all
-functions would be called using the \texttt{JAL} instruction.  Only the
-\texttt{\$s0-\$s7} saved registers and global pointers were to be preserved
-across function calls. Arguments were passed (and not necessarily preserved) in
-the \texttt{\$a0-\$a3} registers, and return values were placed in the
-\texttt{\$v0-\$v1} registers. Any additional arguments or return values were to
-be placed on the stack. It was the caller's responsibility to push any other
-registers which it wants preserved to the stack prior to the call.  To
-facilitate conforming to these rules, we defined macros in
-\texttt{mips/util-macros.asm} for pushing to and popping from the stack, to make
+to define and follow a strict calling convention. We decided that all functions
+would be called using the \texttt{JAL} instruction. Only the \texttt{\$s0-\$s7}
+saved registers and global pointers would be preserved across function calls.
+Arguments were passed (and not necessarily preserved) in the \texttt{\$a0-\$a3}
+registers and return values were placed in the \texttt{\$v0-\$v1} registers. Any
+additional arguments or return values would be placed on the stack. It was the
+caller's responsibility to push the return address of its scope and any other
+registers which it wanted preserved to the stack prior to calling the next
+function. To facilitate conforming to these rules, we defined macros in
+\texttt{mips/util-macros.asm} for pushing to and popping from the stack to make
 those operations semantically clear in our code.
 
 \section{User Interface}
@@ -203,10 +205,10 @@ To compile MARS with our implemented syscalls, run \texttt{make} from the
 project root. Then run \texttt{java -jar Mars4\_5-SockMod.jar} or directly open
 the JAR to use the modified version of MARS. Load the \texttt{mips/main.asm}
 file into the simulator. Assemble and run that to start a server listening on
-port 19001 (\url{http://localhost:19001/}). Now, navigate to any file in the
-\texttt{html/} directory, leaving off the \texttt{html/} part of the path as
-that directory is considered to be root by the server. Alternatively, the server
-can be accessed using the Unix tool \texttt{curl}.
+port 19001 (\texttt{\url{http://localhost:19001/}}). Now, the content in the
+\texttt{html/} directory is hosted at the root of the server. The content we
+created for this project is rendered below as our interface examples.
+Alternatively, the server can be accessed using the Unix tool \texttt{curl}.
 
 \section{Documentation of Runs}
 
@@ -275,7 +277,7 @@ complete it due to personal circumstances.
 
 We started this project to build a simple web server in MIPS. Despite the high
 upfront workload, our collective components merged into what has been called ``a
-surprsingly robust web server.'' Thus, we have achieved our goal: building a
+surprsingly robust web server.'' Thus, we have achieved our goal: writing a
 static webserver in MIPS and MARS.
 
 \appendices
@@ -311,7 +313,7 @@ static webserver in MIPS and MARS.
 
 
 The authors would like to thank Cameron Gutman
-\texttt{\url{https://github.com/cgutman}} for providing information about the
+(\texttt{\url{https://github.com/cgutman}}) for providing information about the
 usage of identity transfer encoding.
 
 % references section
